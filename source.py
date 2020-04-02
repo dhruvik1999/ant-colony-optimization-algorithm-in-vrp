@@ -40,16 +40,22 @@ def start_ant(nvis,dpot):
 	path = []
 	weight = 0
 	while len(nvis)!=0:
-		mx = (-1,-1)
-		check = []
-		for i in nvis:
-			check.append( ( ((ph[cp][i])**alpha)*((1/graph[cp][i])**beta),i) )
-		for i in check:
-			if(i[0]>mx[0] or i[0]==mx[0] and ph[cp][i[1]]>=ph[cp][mx[1]] ):
-				mx=i
-		path.append(mx[1])
-		weight += graph[cp][mx[1]]
-		cp=mx[1]
+		# mx = (-1,-1)
+		# check = []
+		# for i in nvis:
+		# 	check.append( ( ((ph[cp][i])**alpha)*((1/graph[cp][i])**beta),i) )
+		# for i in check:
+		# 	if(i[0]>mx[0] or i[0]==mx[0] and ph[cp][i[1]]>=ph[cp][mx[1]] ):
+		# 		mx=i
+		# path.append(mx[1])
+		# weight += graph[cp][mx[1]]
+		probabilities = list(map(lambda x: ((ph[cp][x])**alpha)*((1/graph[cp][x])**beta), nvis))
+		probabilities = probabilities/np.sum(probabilities)    
+		cp_temp = np.random.choice(nvis, p=probabilities)
+		path.append(cp_temp)
+		weight += graph[cp][cp_temp]
+		cp=cp_temp
+		# cp=mx[1]
 		nvis.remove(cp)
 	weight += graph[cp][0]
 	cp=dpot
@@ -88,6 +94,18 @@ def main():
 	read_data()
 	for _ in range(iterations):
 		start_spreading_ants()
+		pass
+
+	print("------------------------------------------------------------------")
+	veh1 = input("Vehical 1's nodes :").split(" ")
+	veh2 = input("Vehical 2's nodes :").split(" ")
+	veh3 = input("Vehical 3's nodes :").split(" ")
+
+	veh1 = [ int(i) for i in veh1 ]
+	veh2 = [ int(i) for i in veh2 ]
+	veh3 = [ int(i) for i in veh3 ]
+
+
 
 
 if __name__ == '__main__':
