@@ -1,14 +1,17 @@
 import pandas as pd
 import numpy as np
 
+iterations = 1000
+ants = 22
+
 graph = []
 ph = []
 num_node = 0
 nodes = []
 
-alpha=1
-beta=1
-dens=1
+alpha=0.5
+beta=0.4
+dens=0.8
 
 def read_data():
 	global graph
@@ -32,7 +35,6 @@ def start_ant(nvis,dpot):
 	global num_node
 	global nodes
 
-
 	print("\n\nAnt started...")
 	cp=dpot
 	path = []
@@ -42,45 +44,50 @@ def start_ant(nvis,dpot):
 		check = []
 		for i in nvis:
 			check.append( ( ((ph[cp][i])**alpha)*((1/graph[cp][i])**beta),i) )
-			# print("AA" ,((ph[cp][i])**alpha)*((1/graph[cp][i])**beta) )
 		for i in check:
 			if(i[0]>mx[0] or i[0]==mx[0] and ph[cp][i[1]]>=ph[cp][mx[1]] ):
 				mx=i
 		path.append(mx[1])
 		weight += graph[cp][mx[1]]
 		cp=mx[1]
-		print(cp,len(check))
 		nvis.remove(cp)
 	weight += graph[cp][0]
 	cp=dpot
 	path.append(dpot)
-	print(ph)
+	# print(ph)
+
+	for i in range(num_node):
+		for j in range(num_node):
+			ph[i][j] -= dens*ph[i][j]
 
 	for i in path:
 		ph[cp][i]+=1/weight
 		ph[i][cp]=ph[cp][i]
 		cp=i
 	print("Weight : ", weight)
+	print("Dpot : ", dpot)
 	print(path)
-	print(ph)
+	return path
+	# print(ph)
 
-def start_spreading_ants(num_ants,dpot):
+def start_spreading_ants():
 	global graph
 	global ph
 	global num_node
 	global nodes
 
-	for i in range(num_ants):
+	for i in range(ants):
 		nvis = []
 		for i in range(num_node):
-			if i != dpot:
-				nvis.append(i)
-		start_ant(nvis,0)
-
+			nvis.append(i)
+		dpot = np.random.choice(nvis)
+		nvis.remove(dpot)
+		start_ant(nvis,dpot)
 
 def main():
 	read_data()
-	start_spreading_ants(10,0)
+	for _ in range(iterations):
+		start_spreading_ants()
 
 
 if __name__ == '__main__':
