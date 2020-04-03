@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-iterations = 1000
+iterations = 100
 ants = 22
 
 graph = []
@@ -9,8 +9,8 @@ ph = []
 num_node = 0
 nodes = []
 
-alpha=0.5
-beta=0.4
+alpha=0.8
+beta=0.5
 dens=0.8
 
 def read_data():
@@ -34,66 +34,71 @@ def start_ant(nvis,dpot):
 	global ph
 	global num_node
 	global nodes
-
-	print("\n\nAnt started...")
+	# print("Ant started...")
 	cp=dpot
 	path = []
+	path.append(cp)
 	weight = 0
 	while len(nvis)!=0:
-		# mx = (-1,-1)
-		# check = []
-		# for i in nvis:
-		# 	check.append( ( ((ph[cp][i])**alpha)*((1/graph[cp][i])**beta),i) )
-		# for i in check:
-		# 	if(i[0]>mx[0] or i[0]==mx[0] and ph[cp][i[1]]>=ph[cp][mx[1]] ):
-		# 		mx=i
-		# path.append(mx[1])
-		# weight += graph[cp][mx[1]]
-		probabilities = list(map(lambda x: ((ph[cp][x])**alpha)*((1/graph[cp][x])**beta), nvis))
-		probabilities = probabilities/np.sum(probabilities)    
-		cp_temp = np.random.choice(nvis, p=probabilities)
-		path.append(cp_temp)
-		weight += graph[cp][cp_temp]
-		cp=cp_temp
-		# cp=mx[1]
+		probabilities = list(map(lambda x: ( ( ( (ph[cp][x])**alpha)*((1/graph[cp][x])**beta))  ) , nvis))
+		probabilities = probabilities/np.sum(probabilities)  
+		cp = np.random.choice(nvis, p=probabilities)
+		path.append(cp)
 		nvis.remove(cp)
-	weight += graph[cp][0]
-	cp=dpot
-	path.append(dpot)
-	# print(ph)
+	return path
 
+def update_feromone(dpot,best_solution):
 	for i in range(num_node):
 		for j in range(num_node):
 			ph[i][j] -= dens*ph[i][j]
+			if ph[i][j]<=0:
+				ph[i][j]=(10**(-10))
 
-	for i in path:
-		ph[cp][i]+=1/weight
-		ph[i][cp]=ph[cp][i]
-		cp=i
-	print("Weight : ", weight)
-	print("Dpot : ", dpot)
-	print(path)
-	return path
-	# print(ph)
+	cp = dpot
+	best_solution[1].append(dpot)
+	for x in best_solution[1]:
+		if cp != x:
+			ph[cp][x] += 1/graph[cp][x]
+			ph[x][cp] = ph[cp][x]
+			cp=x
 
-def start_spreading_ants():
+def getWeight(path,dpot):
+	x=dpot
+	weight = 0
+	for y in path:
+		weight+=graph[x][y]
+		x=y
+	weight+=graph[x][dpot]
+	return weight
+
+def get_best_solution(solution):
+	ma=solution[0]
+	for soln in solution:
+		if ma[0]>soln[0]:
+			ma=soln
+	return ma
+
+def start_spreading_ants(nvis):
 	global graph
 	global ph
 	global num_node
 	global nodes
 
+	solution = []
 	for i in range(ants):
-		nvis = []
-		for i in range(num_node):
-			nvis.append(i)
-		dpot = np.random.choice(nvis)
-		nvis.remove(dpot)
-		start_ant(nvis,dpot)
+		nnvis = nvis.copy()
+		dpot = np.random.choice(nnvis)
+		nnvis.remove(dpot)
+		path = start_ant(nnvis,dpot)
+		solution.append( (getWeight(path,0),path) )
+	best_solution = get_best_solution(solution)
+	print(best_solution)
+	update_feromone(0,best_solution)
 
 def main():
 	read_data()
 	for _ in range(iterations):
-		start_spreading_ants()
+		start_spreading_ants([i for i in range(num_node)])
 		pass
 
 	print("------------------------------------------------------------------")
