@@ -78,12 +78,13 @@ def get_best_solution(solution):
 			ma=soln
 	return ma
 
-def start_spreading_ants(nvis):
+def start_spreading_ants(nvis,shortest_dist):
 	global graph
 	global ph
 	global num_node
 	global nodes
 
+	
 	solution = []
 	for i in range(ants):
 		nnvis = nvis.copy()
@@ -92,24 +93,41 @@ def start_spreading_ants(nvis):
 		path = start_ant(nnvis,dpot)
 		solution.append( (getWeight(path,0),path) )
 	best_solution = get_best_solution(solution)
-	print(best_solution)
+	# print(best_solution)
+	if shortest_dist[0] > best_solution[0]:
+		shortest_dist=best_solution
 	update_feromone(0,best_solution)
+	return shortest_dist
 
 def main():
 	read_data()
-	for _ in range(iterations):
-		start_spreading_ants([i for i in range(num_node)])
-		pass
+	# for _ in range(iterations):
+	# 	start_spreading_ants([i for i in range(num_node)])
+	# 	pass
 
 	print("------------------------------------------------------------------")
-	veh1 = input("Vehical 1's nodes :").split(" ")
-	veh2 = input("Vehical 2's nodes :").split(" ")
-	veh3 = input("Vehical 3's nodes :").split(" ")
+	veh1 = input("Vehical 1's nodes :").split(' ')
+	veh2 = input("Vehical 2's nodes :").split(' ')
+	veh3 = input("Vehical 3's nodes :").split(' ')
 
 	veh1 = [ int(i) for i in veh1 ]
 	veh2 = [ int(i) for i in veh2 ]
 	veh3 = [ int(i) for i in veh3 ]
 
+	shortest_dist = (10*200,[])
+	for _ in range(iterations):
+		shortest_dist = start_spreading_ants(veh1,shortest_dist)
+	print("Vehical 1 : ",shortest_dist)
+
+	shortest_dist = (10*200,[])
+	for _ in range(iterations):
+		shortest_dist = start_spreading_ants(veh2,shortest_dist)
+	print("Vehical 2 : ",shortest_dist)
+
+	shortest_dist = (10*200,[])
+	for _ in range(iterations):
+		shortest_dist = start_spreading_ants(veh3,shortest_dist)
+	print("Vehical 3 : ",shortest_dist)
 
 
 
