@@ -1,17 +1,17 @@
 import pandas as pd
 import numpy as np
 
-iterations = 100
-ants = 22
+iterations = 1000
+ants = 13
 
 graph = []
 ph = []
 num_node = 0
 nodes = []
 
-alpha=0.8
+alpha=0.5
 beta=0.5
-dens=0.8
+dens=0.25
 
 def read_data():
 	global graph
@@ -19,8 +19,8 @@ def read_data():
 	global num_node
 	global nodes
 
-	print("Ant colony opt for VRP")
-	dt = pd.read_csv('ip.csv')
+	# print("Ant colony opt for VRP")
+	dt = pd.read_csv('ip2.csv')
 	graph = dt.to_numpy()
 	num_node = len(graph)
 	temp = []
@@ -43,6 +43,12 @@ def start_ant(nvis,dpot):
 		probabilities = list(map(lambda x: ( ( ( (ph[cp][x])**alpha)*((1/graph[cp][x])**beta))  ) , nvis))
 		probabilities = probabilities/np.sum(probabilities)  
 		cp = np.random.choice(nvis, p=probabilities)
+		# cp=nvis[0]
+		# mm=probabilities[0]
+		# for i in len(probabilities):
+		# 	if probabilities[i] >mm:
+		# 		mm=probabilities[i]
+		# 		cp=nvis[i]
 		path.append(cp)
 		nvis.remove(cp)
 	return path
@@ -50,7 +56,7 @@ def start_ant(nvis,dpot):
 def update_feromone(dpot,best_solution):
 	for i in range(num_node):
 		for j in range(num_node):
-			ph[i][j] -= dens*ph[i][j]
+			ph[i][j] -= (1-dens)*ph[i][j]
 			if ph[i][j]<=0:
 				ph[i][j]=(10**(-10))
 
@@ -100,7 +106,11 @@ def start_spreading_ants(nvis,shortest_dist):
 	return shortest_dist
 
 def main():
-	read_data()
+	global alpha
+	global beta
+	global dens
+	global iterations
+	# read_data()
 	# for _ in range(iterations):
 	# 	start_spreading_ants([i for i in range(num_node)])
 	# 	pass
@@ -114,20 +124,82 @@ def main():
 	veh2 = [ int(i) for i in veh2 ]
 	veh3 = [ int(i) for i in veh3 ]
 
-	shortest_dist = (10*200,[])
-	for _ in range(iterations):
-		shortest_dist = start_spreading_ants(veh1,shortest_dist)
-	print("Vehical 1 : ",shortest_dist)
+	
 
-	shortest_dist = (10*200,[])
-	for _ in range(iterations):
-		shortest_dist = start_spreading_ants(veh2,shortest_dist)
-	print("Vehical 2 : ",shortest_dist)
+	print("alpha:",alpha, " | beta:", beta, " | density",dens, " | Iterations: ",iterations, " | ants:",ants)
+	
+	# shortest_dist = (10*200,[])
+	# for _ in range(iterations):
+	# 	shortest_dist = start_spreading_ants(veh1,shortest_dist)
+	# sd1=shortest_dist
+	# print("Vehical 1 : ",shortest_dist)
 
-	shortest_dist = (10*200,[])
-	for _ in range(iterations):
-		shortest_dist = start_spreading_ants(veh3,shortest_dist)
-	print("Vehical 3 : ",shortest_dist)
+	# shortest_dist = (10*200,[])
+	# for _ in range(iterations):
+	# 	shortest_dist = start_spreading_ants(veh2,shortest_dist)
+	# sd2=shortest_dist
+	# print("Vehical 2 : ",shortest_dist)
+
+	# shortest_dist = (10*200,[])
+	# for _ in range(iterations):
+	# 	shortest_dist = start_spreading_ants(veh3,shortest_dist)
+	# sd3=shortest_dist
+	# print("Vehical 3 : ",shortest_dist)
+	# print(",sd1[0],",",sd2[0],",",sd3[0])
+
+
+
+	# for q in [0.5]:
+	# 	for i in [0.1,0.2,0.3,0.5,0.6,0.8,1]:
+	# 		for j in [0.2,0.3,0.5,0.6,0.8,0.9,1]:
+	# 			alpha=i
+	# 			beta=j
+	# 			dens=q
+	# 			shortest_dist = (10*200,[])
+	# 			for _ in range(iterations):
+	# 				shortest_dist = start_spreading_ants(veh1,shortest_dist)
+	# 			sd1=shortest_dist
+	# 			#print("Vehical 1 : ",shortest_dist)
+
+	# 			shortest_dist = (10*200,[])
+	# 			for _ in range(iterations):
+	# 				shortest_dist = start_spreading_ants(veh2,shortest_dist)
+	# 			sd2=shortest_dist
+	# 			#print("Vehical 2 : ",shortest_dist)
+
+	# 			shortest_dist = (10*200,[])
+	# 			for _ in range(iterations):
+	# 				shortest_dist = start_spreading_ants(veh3,shortest_dist)
+	# 			sd3=shortest_dist
+	# 			#print("Vehical 3 : ",shortest_dist)
+				# print(q,",",i,",",j,",",sd1[0],",",sd2[0],",",sd3[0])
+
+	for itr in range(500):
+		read_data()
+		iterations=itr
+		shortest_dist = (10*200,[])
+		for _ in range(iterations):
+			shortest_dist = start_spreading_ants(veh1,shortest_dist)
+		sd1=shortest_dist
+		# print("Vehical 1 : ",shortest_dist)
+
+		shortest_dist = (10*200,[])
+		for _ in range(iterations):
+			shortest_dist = start_spreading_ants(veh2,shortest_dist)
+		sd2=shortest_dist
+		# print("Vehical 2 : ",shortest_dist)
+
+		shortest_dist = (10*200,[])
+		for _ in range(iterations):
+			shortest_dist = start_spreading_ants(veh3,shortest_dist)
+		sd3=shortest_dist
+		# print("Vehical 3 : ",shortest_dist)
+		print(itr,",",sd1[0],",",sd2[0],",",sd3[0])
+
+
+
+
+
 
 
 
