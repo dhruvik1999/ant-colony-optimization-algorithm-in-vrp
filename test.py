@@ -1,10 +1,9 @@
-a = "dhruvik"
+import pandas as pd
+import numpy as np 
 
-def fun1():
-	a="dsksd"
+data = pd.read_csv('op2.csv')
+data = data.to_numpy()
 
-def fun():
-	print(a)
-
-fun1()
-fun()
+for i in data:
+	if i[1]<=240 and i[2]<=240 and i[3]<=240:
+		print(i)

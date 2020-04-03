@@ -42,13 +42,13 @@ def start_ant(nvis,dpot):
 	while len(nvis)!=0:
 		probabilities = list(map(lambda x: ( ( ( (ph[cp][x])**alpha)*((1/graph[cp][x])**beta))  ) , nvis))
 		probabilities = probabilities/np.sum(probabilities)  
-		cp = np.random.choice(nvis, p=probabilities)
-		# cp=nvis[0]
-		# mm=probabilities[0]
-		# for i in len(probabilities):
-		# 	if probabilities[i] >mm:
-		# 		mm=probabilities[i]
-		# 		cp=nvis[i]
+		# cp = np.random.choice(nvis, p=probabilities)
+		cp=nvis[0]
+		mm=probabilities[0]
+		for i in range(len(probabilities)):
+			if probabilities[i] >mm:
+				mm=probabilities[i]
+				cp=nvis[i]
 		path.append(cp)
 		nvis.remove(cp)
 	return path
