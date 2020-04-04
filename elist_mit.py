@@ -99,7 +99,7 @@ def update_feromone(dpot,best_solution,shortest_dist):
 	for x in best_solution[1]:
 		if cp != x:
 			#Q=1,l=graph[cp][x]
-			ph[cp][x] += 1/graph[cp][x] 
+			ph[cp][x] += 1/graph[cp][x] + (ants/6)*(1/shortest_dist[0])
 			ph[x][cp] = ph[cp][x]
 			cp=x
 
@@ -148,7 +148,7 @@ def select_nodes(n,path):
 		cp=0
 		for i in range(0,len(path)-1):
 			change = graph[path[cp]][path[i]]+graph[path[i]][ path[i+1] ]-graph[path[cp]][path[i+1]]
-			print("changes : " , change)
+			# print("changes : " , change)
 			if change > max_node[0]:
 				max_node = (change,i)
 			cp=i
@@ -193,9 +193,30 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 
 	# print("best",best_solution)
 	ID = 240-best_solution[0]
-	if itr>0 and ID>0:
+	if itr>10 and ID>0:
 		if veh_type==2:
-			pass
+			ID1 = 240 - all_sd[1][0]
+			from_veh = 1
+			inds = []
+			if twt/4 <= ID and ID <twt/2:
+				# inds.append( np.random.choice( all_sd[from_veh][1][:-1] ) )
+				inds = select_nodes(1,all_sd[from_veh][1])
+				# print("----> ", inds)
+				all_sd[from_veh][1].remove(inds[0])
+				all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
+				veh3.append(inds[0])
+				all_sd[2][1].append(inds[0])
+				all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
+				shortest_dist=all_sd[2]
+				best_solution=all_sd[2]
+				veh1.remove(inds[0])
+
+			elif twt/2 <= ID and ID < 3*twt/4:
+				pass
+			elif 3*twt/4 >= ID:
+				pass
+			else:
+				pass
 		elif veh_type==3:
 			ID1 = 240 - all_sd[1][0]
 			ID2 = 240 - all_sd[2][0]
@@ -209,12 +230,14 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 			if twt/4 <= ID and ID <twt/2:
 				# inds.append( np.random.choice( all_sd[from_veh][1][:-1] ) )
 				inds = select_nodes(1,all_sd[from_veh][1])
-				print("----> ", inds)
+				# print("----> ", inds)
 				all_sd[from_veh][1].remove(inds[0])
 				all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
 				veh3.append(inds[0])
+				all_sd[3][1].append(inds[0])
 				all_sd[3]=(getWeight(all_sd[3][1],0) , all_sd[3][1] )
 				shortest_dist=all_sd[3]
+				best_solution=all_sd[3]
 
 				if from_veh==1:
 					veh1.remove(inds[0])
@@ -266,13 +289,8 @@ def main():
 	print("alpha:",alpha, " | beta:", beta, " | density",dens, " | Iterations: ",iterations, " | ants:",ants)
 
 	# code for n number of iteration
-	for itr in range(0,1):
+	for itr in range(0,100):
 		read_data()
-
-		print("7 10",graph[7][10])
-		print("10 3",graph[10][3])
-		print("7 3",graph[7][3])
-
 
 		iterations=itr
 		#iteration = 1
@@ -304,7 +322,7 @@ def main():
 		#printing result, shortest distance of all the vehicals.
 		if itr!=0:
 			# print(itr,",",sd1[0],",",sd2[0],",",sd3[0])
-			print(all_sd)
+			print(itr,all_sd)
 
 if __name__ == '__main__':
 	main()
