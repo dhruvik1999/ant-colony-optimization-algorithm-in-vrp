@@ -116,13 +116,17 @@ def main():
 	# 	pass
 
 	print("------------------------------------------------------------------")
-	veh1 = input("Vehical 1's nodes :").split(' ')
-	veh2 = input("Vehical 2's nodes :").split(' ')
-	veh3 = input("Vehical 3's nodes :").split(' ')
+	# veh1 = input("Vehical 1's nodes :").split(' ')
+	# veh2 = input("Vehical 2's nodes :").split(' ')
+	# veh3 = input("Vehical 3's nodes :").split(' ')
 
-	veh1 = [ int(i) for i in veh1 ]
-	veh2 = [ int(i) for i in veh2 ]
-	veh3 = [ int(i) for i in veh3 ]
+	# veh1 = [ int(i) for i in veh1 ]
+	# veh2 = [ int(i) for i in veh2 ]
+	# veh3 = [ int(i) for i in veh3 ]
+
+	veh1 = [1,4,6,9,10,12]
+	veh2 = [8,11,13,2,5]
+	veh3 = [3,7]
 
 	
 
@@ -195,6 +199,21 @@ def main():
 		sd3=shortest_dist
 		# print("Vehical 3 : ",shortest_dist)
 		print(itr,",",sd1[0],",",sd2[0],",",sd3[0])
+	
+	# read_data()
+	# sd1 = (10**200,[])
+	# sd2 = (10**200,[])
+	# sd3 = (10**200,[])
+
+	# for itr in range(1000):
+	# 	iterations=itr
+	# 	sd1 = start_spreading_ants(veh1,sd1)
+
+	# 	sd2 = start_spreading_ants(veh2,sd2)
+		
+	# 	sd3 = start_spreading_ants(veh3,sd3)
+	# 	# print("Vehical 3 : ",shortest_dist)
+	# 	print(itr,",",sd1[0],",",sd2[0],",",sd3[0])
 
 
 

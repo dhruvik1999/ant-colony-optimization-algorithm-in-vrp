@@ -46,8 +46,6 @@ def start_ant(nvis,dpot):
 	cp=dpot
 	path = []
 	path.append(cp)
-	weight = 0
-
 	# This loop makes ant to visit each&every vertex. By the time visiting the vertex, it will remove the vertex from nvis(not visited list).
 	while len(nvis)!=0:
 		#count the probabilities of non visited vertex.
@@ -178,6 +176,10 @@ def main():
 	veh2 = [ int(i) for i in veh2 ]
 	veh3 = [ int(i) for i in veh3 ]
 
+	# veh1 = [1,4,6,9,10,12]
+	# veh2 = [8,11,13,2,5]
+	# veh3 = [3,7]
+
 	print("alpha:",alpha, " | beta:", beta, " | density",dens, " | Iterations: ",iterations, " | ants:",ants)
 
 	# code for n number of iteration
@@ -185,21 +187,22 @@ def main():
 		read_data()
 
 		iterations=itr
-
+		#iteration = 1
 		# for n number of iterations, spreading ants in the graph.
-		shortest_dist = (10*200,[])
+		shortest_dist = (10**200,[])
+
 		for _ in range(iterations):
 			# this will start spreading ants in the graph.This will return shortest distance of all the previous iterations
 			shortest_dist = start_spreading_ants(veh1,shortest_dist)
 		sd1=shortest_dist
 
-		shortest_dist = (10*200,[])
+		shortest_dist = (10**200,[])
 		for _ in range(iterations):
 			# this will start spreading ants in the graph.This will return shortest distance of all the previous iterations
 			shortest_dist = start_spreading_ants(veh2,shortest_dist)
 		sd2=shortest_dist
 
-		shortest_dist = (10*200,[])
+		shortest_dist = (10**200,[])
 		for _ in range(iterations):
 			# this will start spreading ants in the graph.This will return shortest distance of all the previous iterations
 			shortest_dist = start_spreading_ants(veh3,shortest_dist)
