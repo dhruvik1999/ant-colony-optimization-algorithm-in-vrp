@@ -141,20 +141,15 @@ def opt_2(path):
 	else:
 		return temp_path
 
-def select_nodes(n,path):
+def select_nodes(path):
 	#0-1--3-4-5-6-0
 	ans = []
-	for j in range(n):
-		max_node = (-100,-1)
-		cp=0
-		for i in range(0,len(path)-1):
-			change = graph[path[cp]][path[i]]+graph[path[i]][ path[i+1] ]-graph[path[cp]][path[i+1]]
-			# print("changes : " , change)
-			if change > max_node[0]:
-				max_node = (change,i)
-			cp=i
-		if max_node[1]!=-1:
-			ans.append(path[max_node[1]])
+	cp=0
+	for i in range(0,len(path)-1):
+		change = graph[path[cp]][path[i]]+graph[path[i]][ path[i+1] ]-graph[path[cp]][path[i+1]]
+		ans.append( (-1*change, path[i] ) )
+		cp=i
+	ans.sort()
 	return ans
 
 def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
@@ -196,95 +191,108 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 	ID = 240-best_solution[0]
 	if itr>1 and ID>0:
 		if veh_type==2:
-			#todo
 			from_veh = 1
 			inds = []
-			if twt/4 <= ID and ID <twt/2:
-				# inds.append( np.random.choice( all_sd[from_veh][1][:-1] ) )
-				inds = select_nodes(1,all_sd[from_veh][1])
-				# print("----> ", inds)
-				all_sd[from_veh][1].remove(inds[0])
-				all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
-				veh2.append(inds[0])
-				all_sd[2][1].append(inds[0])
-				all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
-				shortest_dist=all_sd[2]
-				best_solution=all_sd[2]
-				veh1.remove(inds[0])
 
-			elif twt/2 <= ID and ID < 3*twt/4:
-				inds = select_nodes(2,all_sd[from_veh][1])
-				all_sd[from_veh][1].remove(inds[0])
-				all_sd[from_veh][1].remove(inds[1])
-				all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
-				veh2.append(inds[0])
-				veh2.append(inds[1])
-
-				all_sd[2][1].append(inds[0])
-				all_sd[2][1].append(inds[1])
-				all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
-				shortest_dist=all_sd[2]
-				best_solution=all_sd[2]
-				veh1.remove(inds[0])
-				veh1.remove(inds[1])
-				pass
-			elif 3*twt/4 >= ID:
-				pass
-			else:
-				pass
+			while twt/4 <= ID:
+				inds = select_nodes(all_sd[from_veh][1])
+				lock = True
+				for ind in inds:
+					slp = best_solution[1][-2]
+					lp = best_solution[1][-1]
+					if graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] < twt:
+						lock=False
+						all_sd[from_veh][1].remove(ind[1])
+						all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
+						veh2.append(ind[1])
+						all_sd[2][1].append(ind[0])
+						all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
+						shortest_dist=all_sd[2]
+						best_solution=all_sd[2]
+						veh1.remove(ind[1])
+						ID = 240-best_solution[0]
+				if lock:
+					break
 		elif veh_type==3:
-			ID1 = 240 - all_sd[1][0]
-			ID2 = 240 - all_sd[2][0]
-			from_veh = -1
-			
-			if ID1>ID2:
-				from_veh=2
-			else:
-				from_veh=1
 			inds = []
-			if twt/4 <= ID and ID <twt/2:
-				# inds.append( np.random.choice( all_sd[from_veh][1][:-1] ) )
-				inds = select_nodes(1,all_sd[from_veh][1])
-				# print("----> ", inds)
-				all_sd[from_veh][1].remove(inds[0])
-				all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
-				veh3.append(inds[0])
-				all_sd[3][1].append(inds[0])
-				all_sd[3]=(getWeight(all_sd[3][1],0) , all_sd[3][1] )
-				shortest_dist=all_sd[3]
-				best_solution=all_sd[3]
+			while twt/4<=ID:
+				lock = True
+				ID1 = 240 - all_sd[1][0]
+				ID2 = 240 - all_sd[2][0]
+				from_veh = -1
 
-				if from_veh==1:
-					veh1.remove(inds[0])
+				if ID1>ID2:
+					from_veh=2
 				else:
-					veh2.remove(inds[0])
+					from_veh=1
+				inds = select_nodes(all_sd[from_veh][1])
+				for ind in inds:
+					slp = best_solution[1][-2]
+					lp = best_solution[1][-1]
+					if graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] < twt:
+						lock=False
+						all_sd[from_veh][1].remove(ind[1])
+						all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
+						veh3.append(ind[1])
+						all_sd[3][1].remove(0)
+						all_sd[3][1].append(ind[1])
+						all_sd[3][1].append(0)
+						all_sd[3]=(getWeight(all_sd[3][1],0) , all_sd[3][1] )
+						shortest_dist=all_sd[3]
+						best_solution=all_sd[3]
+						if from_veh==1:
+							veh1.remove(ind[1])
+						else:
+							veh2.remove(ind[1])
+						ID = 240-best_solution[0]
+				if lock:
+					break
 
-			elif twt/2 <= ID and ID < 3*twt/4:
-				inds = select_nodes(2,all_sd[from_veh][1])
-				all_sd[from_veh][1].remove(inds[0])
-				all_sd[from_veh][1].remove(inds[1])
-				all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
-				veh3.append(inds[0])
-				veh3.append(inds[1])
 
-				all_sd[3][1].append(inds[0])
-				all_sd[3][1].append(inds[0])
-				all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
-				shortest_dist=all_sd[2]
-				best_solution=all_sd[2]
-				if from_veh==1:
-					veh1.remove(inds[0])
-					veh1.remove(inds[1])
-				else:
-					veh2.remove(inds[0])
-					veh2.remove(inds[1])
 
-			elif 3*twt/4 >= ID:
-				pass
-			else:
-				pass
-		else:
-			pass
+		# 	if twt/4 <= ID and ID <twt/2:
+		# 		# inds.append( np.random.choice( all_sd[from_veh][1][:-1] ) )
+		# 		inds = select_nodes(1,all_sd[from_veh][1])
+		# 		# print("----> ", inds)
+		# 		all_sd[from_veh][1].remove(inds[0])
+		# 		all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
+		# 		veh3.append(inds[0])
+		# 		all_sd[3][1].append(inds[0])
+		# 		all_sd[3]=(getWeight(all_sd[3][1],0) , all_sd[3][1] )
+		# 		shortest_dist=all_sd[3]
+		# 		best_solution=all_sd[3]
+
+		# 		if from_veh==1:
+		# 			veh1.remove(inds[0])
+		# 		else:
+		# 			veh2.remove(inds[0])
+
+		# 	elif twt/2 <= ID and ID < 3*twt/4:
+		# 		inds = select_nodes(2,all_sd[from_veh][1])
+		# 		all_sd[from_veh][1].remove(inds[0])
+		# 		all_sd[from_veh][1].remove(inds[1])
+		# 		all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
+		# 		veh3.append(inds[0])
+		# 		veh3.append(inds[1])
+
+		# 		all_sd[3][1].append(inds[0])
+		# 		all_sd[3][1].append(inds[0])
+		# 		all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
+		# 		shortest_dist=all_sd[2]
+		# 		best_solution=all_sd[2]
+		# 		if from_veh==1:
+		# 			veh1.remove(inds[0])
+		# 			veh1.remove(inds[1])
+		# 		else:
+		# 			veh2.remove(inds[0])
+		# 			veh2.remove(inds[1])
+
+		# 	elif 3*twt/4 >= ID:
+		# 		pass
+		# 	else:
+		# 		pass
+		# else:
+		# 	pass
 
 	#updating the shortest distance.
 	if shortest_dist[0] > best_solution[0]:
@@ -316,8 +324,8 @@ def main():
 	# veh3 = [ int(i) for i in veh3 ]
 
 	veh1 = [1,4,6,9,10,12]
-	veh3 = [8,11,13,2,5]
-	veh2 = [3,7]
+	veh2 = [8,11,13,2,5]
+	veh3 = [3,7]
 
 	print("alpha:",alpha, " | beta:", beta, " | density",dens, " | Iterations: ",iterations, " | ants:",ants)
 

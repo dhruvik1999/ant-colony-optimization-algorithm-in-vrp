@@ -4,8 +4,8 @@ import math
 from random import *
 from collections import OrderedDict
 
-num_particles = 13
-iterations = 50
+num_particles = 11
+iterations = 100
 
 data = []
 num_node = 0;
@@ -143,7 +143,7 @@ def start_pso(nodes,itr):
 def main():
 	read_data()
 	st1 = start_pso([1,4,6,9,10,12],iterations)
-	st2 = start_pso([8,11,13,2,5],iterations)
+	st2 = start_pso([8,13,11,2,5],iterations)
 	st3 = start_pso([3,7],iterations)
 
 	for i in range(iterations):
