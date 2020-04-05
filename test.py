@@ -1,29 +1,35 @@
 import pandas as pd
 import numpy as np 
 import random
+from collections import OrderedDict
 
-def func(pos_a,pos_b):
-	ans = []
-	hash = {}
-	for i in range( len(pos_b) ):
-		hash[ pos_b[i] ]=i
+# def func(pos_a,pos_b):
+# 	ans = []
+# 	hash = {}
+# 	for i in range( len(pos_b) ):
+# 		hash[ pos_b[i] ]=i
 
-	for i in range( len(pos_a) ):
-		if pos_a[i]!=pos_b[i]:
-			temp_a=pos_b[i]
-			temp_b=pos_a[i]
-			ans.append( (i,hash[pos_a[i]]) )
-			pos_b[i],pos_b[ hash[pos_a[i]] ] = pos_b[ hash[pos_a[i]] ],pos_b[i]
-			hash[ temp_a ] , hash[ temp_b ] = hash[ temp_b ] , hash[ temp_a ]
-	print(ans)
-	return ans
+# 	for i in range( len(pos_a) ):
+# 		if pos_a[i]!=pos_b[i]:
+# 			temp_a=pos_b[i]
+# 			temp_b=pos_a[i]
+# 			ans.append( (i,hash[pos_a[i]]) )
+# 			pos_b[i],pos_b[ hash[pos_a[i]] ] = pos_b[ hash[pos_a[i]] ],pos_b[i]
+# 			hash[ temp_a ] , hash[ temp_b ] = hash[ temp_b ] , hash[ temp_a ]
+# 	print(ans)
+# 	return ans
 
 
-def main():
-	func([1,2,3,4,5,6,7,8],[1,8,6,7,2,3,4,5])
+# def main():
+# 	func([1,2,3,4,5,6,7,8],[1,8,6,7,2,3,4,5])
 
-if __name__ == '__main__':
-	main()
+# if __name__ == '__main__':
+# 	main()
+
+a=[1,1,2]
+a=list(OrderedDict.fromkeys(a))
+print(a)
+
 
 # number_list = [7, 14, 21, 28, 35, 42, 49, 56, 63, 70]
 # print ("Original list : ",  number_list)

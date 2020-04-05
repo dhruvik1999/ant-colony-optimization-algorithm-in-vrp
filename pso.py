@@ -1,15 +1,18 @@
 import pandas as pd 
 import numpy as np 
+import math
 from random import *
+from collections import OrderedDict
 
 num_particles = 13
-iterations = 10
+iterations = 50
 
 data = []
 num_node = 0;
 
-alpha = 0.5
-beta = 0.5
+w=0.6
+alpha = 0.9
+beta = 0.3
 
 def read_data():
 	global data
@@ -24,12 +27,26 @@ class Particle:
 	def __init__(self,position,velocity):
 		self.position=position
 		self.velocity=velocity
-		self.pbest=(self.getTime(self.position),self.position)
+		self.pbest=(self.getTime(self.position),self.position.copy())
 
 	def update(self,gbest):
 		#vel = w*vel + a*(gbest-pos) + b*(pbest-pos)
 		#pos = pos + velocity
-		pass
+
+		self.velocity = self.merge_list( self.mul_const_list(w,self.velocity.copy()) , self.mul_const_list(alpha, self.sub_position( gbest[1] , self.position.copy() ) ) )
+		self.velocity = self.merge_list( self.velocity.copy() , self.mul_const_list(beta, self.sub_position( self.pbest[1] , self.position.copy() ) ) )
+	
+		# shuffle(self.velocity)
+		# self.velocity = self.velocity[:1]
+		# self.velocity = self.velocity[:-1]
+		self.position = self.add_velocity_to_position(self.position , self.velocity)
+		
+		
+		# self.velocity=list(OrderedDict.fromkeys(self.velocity))
+		total_time = self.getTime(self.position)
+
+		if total_time < self.pbest[0]:
+			self.pbest = ( self.getTime(self.position) , self.position)
 
 	def getTime(self,position):
 		cp=0
@@ -39,6 +56,26 @@ class Particle:
 			cp=i
 		total_time+= data[cp][0]
 		return total_time
+	
+	def merge_list(self,l1,l2):
+		l = []
+		if l1!=None:
+			for i in l1:
+				l.append(i)
+		if l2!=None:
+			for i in l2:
+				l.append(i)
+		return l
+
+	def mul_const_list(self,param,velocity):
+		n = len(velocity)
+		param = math.ceil(n*param)
+
+		ans = []
+		for i in range(param):
+			ans.append( velocity[ randint(0,len(velocity)-1) ] )
+			velocity.remove( ans[-1] )
+		return ans
 
 	def sub_position(self,pos_a,pos_b):
 		ans = []
@@ -53,7 +90,7 @@ class Particle:
 				ans.append( (i,hash[pos_a[i]]) )
 				pos_b[i],pos_b[ hash[pos_a[i]] ] = pos_b[ hash[pos_a[i]] ],pos_b[i]
 				hash[ temp_a ] , hash[ temp_b ] = hash[ temp_b ] , hash[ temp_a ]
-		print(ans)
+		# print(ans)
 		return ans
 
 	def add_velocity_to_position(self,position,velocity):
@@ -65,30 +102,54 @@ class Particle:
 		pass
 
 	def print_state(self):
-		print("Position : ",self.position)
+		print("Position : ", self.getTime(self.position) ,self.position)
 		print("Velocity : ",self.velocity)
+		print("pbest : ",self.pbest)
 
 def get_randome_position(nodes):
-	shuffle(nodes)
+	# shuffle(nodes)
 	return nodes
 
-def get_randome_velocity(path_length):
+def get_randome_velocity(path_length,seq_length):
 	velocity = []
-	velocity.append( ( randint(0,path_length-1) , randint(0,path_length-1) ) )
+	for i in range(seq_length):
+		velocity.append( ( randint(0,path_length-1) , randint(0,path_length-1) ) )
 	return velocity
 
-def start_pso(nodes):
-	particles = [ Particle(get_randome_position(nodes.copy()),get_randome_velocity( len(nodes) ) ) for i in range(num_particles) ]
 
-	for particle in particles:
-		print("Particle")
-		# particle.print_state()
-		print("Path : ",particle.position)
-		print("Total time : ",particle.getTime(particle.pbest[1]))
+def start_pso(nodes,itr):
+	particles = [ Particle(get_randome_position(nodes.copy()),get_randome_velocity( len(nodes),3 ) ) for i in range(num_particles) ]
+	gbest = (10**200 , [])
+	list_gbest = []
+	for i in range(itr):
+		for particle in particles:
+			if particle.pbest[0] < gbest[0]:
+				gbest=particle.pbest
+
+		for particle in particles:
+			print("\n particle")
+			particle.print_state()
+			particle.update(gbest)
+			#print("pbest",particle.pbest)
+			particle.print_state()
+
+
+		
+		# print("gbest",gbest)
+		list_gbest.append(gbest)
+
+	return list_gbest
 
 def main():
 	read_data()
-	start_pso([1,2,3,4,5])
+	st1 = start_pso([1,4,6,9,10,12],iterations)
+	st2 = start_pso([8,11,13,2,5],iterations)
+	st3 = start_pso([3,7],iterations)
+
+	for i in range(iterations):
+		print(i+1 , st1[i] , st2[i] , st3[i])
+		# print(i+1,st1[i])
+
 
 if __name__ == '__main__':
 	main()
