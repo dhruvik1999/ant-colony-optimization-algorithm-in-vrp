@@ -134,7 +134,7 @@ def opt_2(path):
 	path.insert( randint(0, len(path[:-1])) ,rnd_node)
 
 	#path = [ 2,5,3,4,2,3,0]
-	#return temp_path
+	#zreturn temp_path
 	#If the new path has less cost than old one, update the  path by returning new one.
 	if getWeight(temp_path,0) > getWeight(path,0):
 		return path
@@ -205,7 +205,7 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 						all_sd[from_veh][1].remove(ind[1])
 						all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
 						veh2.append(ind[1])
-						all_sd[2][1].append(ind[0])
+						all_sd[2][1].append(ind[1])
 						all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
 						shortest_dist=all_sd[2]
 						best_solution=all_sd[2]

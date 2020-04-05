@@ -7,20 +7,26 @@ from collections import OrderedDict
 num_particles = 11
 iterations = 100
 
-data = []
+graph = []
 num_node = 0;
+all_st = {}
+veh1 = []
+veh2 = []
+veh3 = []
 
 w=0.6
 alpha = 0.9
 beta = 0.3
 
-def read_data():
-	global data
+twt = 240
+
+def read_graph():
+	global graph
 	global num_node
 
 	df = pd.read_csv('ip2.csv')
-	data  = df.to_numpy()
-	num_node = len(data)
+	graph  = df.to_numpy()
+	num_node = len(graph)
 
 class Particle:
 
@@ -54,9 +60,9 @@ class Particle:
 		cp=0
 		total_time=0
 		for i in position:
-			total_time += data[cp][i]
+			total_time += graph[cp][i]
 			cp=i
-		total_time+= data[cp][0]
+		total_time+= graph[cp][0]
 		return total_time
 	
 	def merge_list(self,l1,l2):
@@ -112,42 +118,155 @@ def get_randome_position(nodes):
 	# shuffle(nodes)
 	return nodes
 
+def getTime(position):
+	cp=0
+	total_time=0
+	print("-->",position)
+	for i in position:
+		total_time += graph[cp][i]
+		cp=i
+	total_time+= graph[cp][0]
+	return total_time
+
 def get_randome_velocity(path_length,seq_length):
 	velocity = []
 	for i in range(seq_length):
 		velocity.append( ( randint(0,path_length-1) , randint(0,path_length-1) ) )
 	return velocity
 
+def select_nodes(path):
+	#0-1--3-4-5-6-0
+	ans = []
+	cp=0
+	for i in range(0,len(path)-1):
+		change = graph[path[cp]][path[i]]+graph[path[i]][ path[i+1] ]-graph[path[cp]][path[i+1]]
+		ans.append( (-1*change, path[i] ) )
+		cp=i
+	ans.sort()
+	return ans
 
-def start_pso(nodes,itr):
+def start_pso(nodes,itr,veh_type,best_solution):
+	global all_st
+	global veh1
+	global veh2
+	global veh3
 	particles = [ Particle(get_randome_position(nodes.copy()),get_randome_velocity( len(nodes),3 ) ) for i in range(num_particles) ]
 	gbest = (10**200 , [])
-	list_gbest = []
-	for i in range(itr):
-		for particle in particles:
+
+	for particle in particles:
 			if particle.pbest[0] < gbest[0]:
 				gbest=particle.pbest
 
+	for i in range(itr):
+		
 		for particle in particles:
-			print("\n particle")
+			# print("\n particle")
 			# particle.print_state()
 			particle.update(gbest)
 			#print("pbest",particle.pbest)
 			# particle.print_state()
 		# print("gbest",gbest)
-		list_gbest.append(gbest)
 
-	return list_gbest
+		for particle in particles:
+			if particle.pbest[0] < gbest[0]:
+				gbest=particle.pbest
+
+
+	ID = twt - gbest[0]
+	if twt/4 <= ID and itr>1:
+		if veh_type==2:
+			from_veh = 1
+			inds = []
+			while twt/4 <= ID:
+				inds = select_nodes(all_st[from_veh][1])
+				lock = True
+				for ind in inds:
+					slp = best_solution[1][-2]
+					lp = best_solution[1][-1]
+					if graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] < twt:
+						lock=False
+						all_st[from_veh][1].remove(ind[1])
+						all_st[from_veh]=(getTime(all_st[from_veh][1]),all_st[from_veh][1])
+						veh2.append(ind[1])
+						all_st[2][1].append(ind[1])
+						all_st[2]=(getTime(all_st[2][1]) , all_st[2][1] )
+						gbest=all_st[2]
+						best_solution=all_st[2]
+						veh1.remove(ind[1])
+						ID = 240-best_solution[0]
+				if lock:
+					break
+		# elif veh_type==8:
+		# 	inds = []
+		# 	while twt/4<=ID:
+		# 		lock = True
+		# 		ID1 = 240 - all_st[1][0]
+		# 		ID2 = 240 - all_st[2][0]
+		# 		from_veh = -1
+
+		# 		if ID1>ID2:
+		# 			from_veh=2
+		# 		else:
+		# 			from_veh=1
+		# 		inds = select_nodes(all_st[from_veh][1])
+		# 		for ind in inds:
+		# 			slp = best_solution[1][-2]
+		# 			lp = best_solution[1][-1]
+		# 			if graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] < twt:
+		# 				lock=False
+		# 				all_st[from_veh][1].remove(ind[1])
+		# 				all_st[from_veh]=(getTime(all_st[from_veh][1],0),all_st[from_veh][1])
+		# 				veh3.append(ind[1])
+		# 				all_st[3][1].remove(0)
+		# 				all_st[3][1].append(ind[1])
+		# 				all_st[3][1].append(0)
+		# 				all_st[3]=(getTime(all_st[3][1],0) , all_st[3][1] )
+		# 				shortest_dist=all_st[3]
+		# 				best_solution=all_st[3]
+		# 				if from_veh==1:
+		# 					veh1.remove(ind[1])
+		# 				else:
+		# 					veh2.remove(ind[1])
+		# 				ID = 240-best_solution[0]
+		# 		if lock:
+		# 			break
+
+
+
+
+
+	if gbest[0]<best_solution[0]:
+		best_solution=gbest
+	return best_solution
 
 def main():
-	read_data()
-	st1 = start_pso([1,4,6,9,10,12],iterations)
-	st2 = start_pso([8,13,11,2,5],iterations)
-	st3 = start_pso([3,7],iterations)
+	global all_st
+	global veh1
+	global veh2
+	global veh3
+
+	read_graph()
+	veh1 = [1,4,6,9,10,12]
+	veh3 = [8,13,11,2,5]
+	veh2 = [3,7]
+	all_st = {}
+
+	
+	all_st[1] = (10**200,[])
+	all_st[2] = (10**200,[])
+	all_st[3] = (10**200,[])
 
 	for i in range(iterations):
-		print(i+1 , st1[i] , st2[i] , st3[i])
-		# print(i+1,st1[i])
+		all_st[1] = start_pso(veh1,i,1,all_st[1])
+
+		all_st[2] = start_pso(veh2,i,2,all_st[2])
+
+		all_st[3] = start_pso(veh3,i,3,all_st[3])
+		print(i , all_st)
+
+
+
+
 
 
 if __name__ == '__main__':
