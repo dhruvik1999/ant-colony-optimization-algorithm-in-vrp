@@ -27,9 +27,41 @@ class Particle:
 		self.pbest=(self.getTime(self.position),self.position)
 
 	def update(self,gbest):
+		#vel = w*vel + a*(gbest-pos) + b*(pbest-pos)
+		#pos = pos + velocity
 		pass
 
 	def getTime(self,position):
+		cp=0
+		total_time=0
+		for i in position:
+			total_time += data[cp][i]
+			cp=i
+		total_time+= data[cp][0]
+		return total_time
+
+	def sub_position(self,pos_a,pos_b):
+		ans = []
+		hash = {}
+		for i in range( len(pos_b) ):
+			hash[ pos_b[i] ]=i
+
+		for i in range( len(pos_a) ):
+			if pos_a[i]!=pos_b[i]:
+				temp_a=pos_b[i]
+				temp_b=pos_a[i]
+				ans.append( (i,hash[pos_a[i]]) )
+				pos_b[i],pos_b[ hash[pos_a[i]] ] = pos_b[ hash[pos_a[i]] ],pos_b[i]
+				hash[ temp_a ] , hash[ temp_b ] = hash[ temp_b ] , hash[ temp_a ]
+		print(ans)
+		return ans
+
+	def add_velocity_to_position(self,position,velocity):
+		for i in velocity:
+			position[i[0]],position[i[1]] = position[i[1]],position[i[0]]
+		return position
+
+	def add_two_velocity(self,vel1,vel2):
 		pass
 
 	def print_state(self):
@@ -50,7 +82,9 @@ def start_pso(nodes):
 
 	for particle in particles:
 		print("Particle")
-		particle.print_state()
+		# particle.print_state()
+		print("Path : ",particle.position)
+		print("Total time : ",particle.getTime(particle.pbest[1]))
 
 def main():
 	read_data()

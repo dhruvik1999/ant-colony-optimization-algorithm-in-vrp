@@ -10,12 +10,17 @@ def func(pos_a,pos_b):
 
 	for i in range( len(pos_a) ):
 		if pos_a[i]!=pos_b[i]:
+			temp_a=pos_b[i]
+			temp_b=pos_a[i]
+			ans.append( (i,hash[pos_a[i]]) )
 			pos_b[i],pos_b[ hash[pos_a[i]] ] = pos_b[ hash[pos_a[i]] ],pos_b[i]
-			print(pos_b)
+			hash[ temp_a ] , hash[ temp_b ] = hash[ temp_b ] , hash[ temp_a ]
+	print(ans)
+	return ans
 
 
 def main():
-	func([1,2,3,4,5],[1,3,4,2,5])
+	func([1,2,3,4,5,6,7,8],[1,8,6,7,2,3,4,5])
 
 if __name__ == '__main__':
 	main()

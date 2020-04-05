@@ -134,7 +134,7 @@ def opt_2(path):
 	path.insert( randint(0, len(path[:-1])) ,rnd_node)
 
 	#path = [ 2,5,3,4,2,3,0]
-	# return temp_path
+	#return temp_path
 	#If the new path has less cost than old one, update the  path by returning new one.
 	if getWeight(temp_path,0) > getWeight(path,0):
 		return path
@@ -179,7 +179,7 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 		nnvis.remove(dpot)
 		#ant will start from the mentioned dpot.
 		path = start_ant(nnvis,dpot)
-		# path = opt_2(path)
+		path = opt_2(path)
 		solution.append( (getWeight(path,0),path) )
 
 	# "get_best_solution" will return shortest path coverd among all the ants.
@@ -193,7 +193,7 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 
 	# print("best",best_solution)
 	ID = 240-best_solution[0]
-	if itr>10 and ID>0:
+	if itr>1 and ID>0:
 		if veh_type==2:
 			ID1 = 240 - all_sd[1][0]
 			from_veh = 1
@@ -204,7 +204,7 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 				# print("----> ", inds)
 				all_sd[from_veh][1].remove(inds[0])
 				all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
-				veh3.append(inds[0])
+				veh2.append(inds[0])
 				all_sd[2][1].append(inds[0])
 				all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
 				shortest_dist=all_sd[2]
@@ -212,6 +212,20 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 				veh1.remove(inds[0])
 
 			elif twt/2 <= ID and ID < 3*twt/4:
+				inds = select_nodes(2,all_sd[from_veh][1])
+				all_sd[from_veh][1].remove(inds[0])
+				all_sd[from_veh][1].remove(inds[1])
+				all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
+				veh2.append(inds[0])
+				veh2.append(inds[1])
+
+				all_sd[2][1].append(inds[0])
+				all_sd[2][1].append(inds[1])
+				all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
+				shortest_dist=all_sd[2]
+				best_solution=all_sd[2]
+				veh1.remove(inds[0])
+				veh1.remove(inds[1])
 				pass
 			elif 3*twt/4 >= ID:
 				pass
@@ -245,7 +259,25 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 					veh2.remove(inds[0])
 
 			elif twt/2 <= ID and ID < 3*twt/4:
-				pass
+				inds = select_nodes(2,all_sd[from_veh][1])
+				all_sd[from_veh][1].remove(inds[0])
+				all_sd[from_veh][1].remove(inds[1])
+				all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
+				veh3.append(inds[0])
+				veh3.append(inds[1])
+
+				all_sd[3][1].append(inds[0])
+				all_sd[3][1].append(inds[0])
+				all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
+				shortest_dist=all_sd[2]
+				best_solution=all_sd[2]
+				if from_veh==1:
+					veh1.remove(inds[0])
+					veh1.remove(inds[1])
+				else:
+					veh2.remove(inds[0])
+					veh2.remove(inds[1])
+
 			elif 3*twt/4 >= ID:
 				pass
 			else:
