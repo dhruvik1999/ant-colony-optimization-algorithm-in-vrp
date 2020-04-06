@@ -316,8 +316,8 @@ def main():
 	# veh3 = [ int(i) for i in veh3 ]
 
 	veh1 = [1,4,6,9,10,12]
-	veh3 = [8,11,13,2,5]
-	veh2 = [3,7]
+	veh2 = [8,11,13,2,5]
+	veh3 = [3,7]
 
 	print("alpha:",alpha, " | beta:", beta, " | density",dens, " | Iterations: ",iterations, " | ants:",ants)
 

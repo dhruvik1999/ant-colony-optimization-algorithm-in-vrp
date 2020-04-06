@@ -81,10 +81,17 @@ def update_feromone(dpot,best_solution,shortest_dist):
 
 	#end of the path is also dpot(0). so, i'm appending mnly.
 	best_solution[1].append(dpot)
+	#path = [1,2,3,4,0]
+	# 0-1
+	# 1-2
+	# 2-3
+	# 3-4
+	# 4-0
 
 	# taking each edges in best path and updating feromone level.
 	for x in best_solution[1]:
 		if cp != x:
+			#Q=1,l=graph[cp][x]
 			ph[cp][x] += 1/graph[cp][x] + (ants/6)*(1/shortest_dist[0])
 			ph[x][cp] = ph[cp][x]
 			cp=x
@@ -111,12 +118,15 @@ def opt_2(path):
 	#making 2 path. temp_path is old path. "path" is the path where all the 2-opt changes gonna happen.
 	temp_path = path.copy()
 
+	# path = [2,3,4,5,2,3,0]
 	# selecting rendomly node from the path and removing that node.
 	rnd_node = np.random.choice(path[:-1])
 	path.remove(rnd_node)
 
 	#inserting the selected node randomaly.
 	path.insert( randint(0, len(path[:-1])) ,rnd_node)
+
+	#path = [ 2,5,3,4,2,3,0]
 	
 	#If the new path has less cost than old one, update the  path by returning new one.
 	if getWeight(temp_path,0) > getWeight(path,0):
@@ -150,6 +160,7 @@ def start_spreading_ants(nvis,shortest_dist):
 	# "opt_2" will apply 2-opt method on best solution.
 	opt_best_solution = opt_2(best_solution[1])
 	# upedating the best solution.
+	#todo:
 	best_solution = ( getWeight(opt_best_solution,0) , opt_best_solution )
 	
 	#updating the shortest distance.
@@ -261,3 +272,7 @@ if __name__ == '__main__':
 	# 			sd3=shortest_dist
 	# 			#print("Vehical 3 : ",shortest_dist)
 				# print(q,",",i,",",j,",",sd1[0],",",sd2[0],",",sd3[0])
+
+#TODO
+#1. name of variables(ACC to problem)
+#2. MM ideal time.

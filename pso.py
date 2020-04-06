@@ -4,15 +4,15 @@ import math
 from random import *
 from collections import OrderedDict
 
-num_particles = 11
+num_particles = 8
 iterations = 100
 
 data = []
 num_node = 0;
 
-w=0.6
+w=0.7
 alpha = 0.9
-beta = 0.3
+beta = 0.7
 
 def read_data():
 	global data
@@ -27,7 +27,7 @@ class Particle:
 	def __init__(self,position,velocity):
 		self.position=position
 		self.velocity=velocity
-		self.pbest=(self.getTime(self.position),self.position.copy())
+		self.pbest=(self.getTime(self.position.copy()),self.position.copy())
 
 	def update(self,gbest):
 		#vel = w*vel) + a*(gbest-pos) + b*(pbest-pos)
@@ -37,11 +37,12 @@ class Particle:
 
 		self.velocity = self.merge_list( self.mul_const_list(w,self.velocity.copy()) , self.mul_const_list(alpha, self.sub_position( gbest[1] , self.position.copy() ) ) )
 		self.velocity = self.merge_list( self.velocity.copy() , self.mul_const_list(beta, self.sub_position( self.pbest[1] , self.position.copy() ) ) )
-	
+		
+		self.position = self.add_velocity_to_position(self.position , self.velocity)
+
 		# shuffle(self.velocity)
 		# self.velocity = self.velocity[:1]
 		# self.velocity = self.velocity[:-1]
-		self.position = self.add_velocity_to_position(self.position , self.velocity)
 		
 		
 		# self.velocity=list(OrderedDict.fromkeys(self.velocity))
@@ -71,12 +72,17 @@ class Particle:
 
 	def mul_const_list(self,param,velocity):
 		n = len(velocity)
-		param = math.ceil(n*param)
+		# param = math.ceil(n*param)
 
 		ans = []
-		for i in range(param):
-			ans.append( velocity[ randint(0,len(velocity)-1) ] )
-			velocity.remove( ans[-1] )
+		for vel in velocity:
+			if param >= random():
+				ans.append(vel)
+
+		# for i in range(param):
+
+		# 	ans.append( velocity[ randint(0,len(velocity)-1) ] )
+		# 	velocity.remove( ans[-1] )
 		return ans
 
 	def sub_position(self,pos_a,pos_b):
@@ -109,7 +115,7 @@ class Particle:
 		print("pbest : ",self.pbest)
 
 def get_randome_position(nodes):
-	# shuffle(nodes)
+	shuffle(nodes)
 	return nodes
 
 def get_randome_velocity(path_length,seq_length):
@@ -130,10 +136,10 @@ def start_pso(nodes,itr):
 
 		for particle in particles:
 			print("\n particle")
-			# particle.print_state()
+			particle.print_state()
 			particle.update(gbest)
 			#print("pbest",particle.pbest)
-			# particle.print_state()
+			particle.print_state()
 		# print("gbest",gbest)
 		list_gbest.append(gbest)
 

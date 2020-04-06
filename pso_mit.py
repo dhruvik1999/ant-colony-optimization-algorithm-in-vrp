@@ -4,8 +4,8 @@ import math
 from random import *
 from collections import OrderedDict
 
-num_particles = 11
-iterations = 100
+num_particles = 3
+iterations = 1000
 
 graph = []
 num_node = 0;
@@ -14,9 +14,9 @@ veh1 = []
 veh2 = []
 veh3 = []
 
-w=0.6
+w=0.7
 alpha = 0.9
-beta = 0.3
+beta = 0.7
 
 twt = 240
 
@@ -80,9 +80,14 @@ class Particle:
 		param = math.ceil(n*param)
 
 		ans = []
-		for i in range(param):
-			ans.append( velocity[ randint(0,len(velocity)-1) ] )
-			velocity.remove( ans[-1] )
+		for vel in velocity:
+			if param >= random():
+				ans.append(vel)
+
+		# for i in range(param):
+
+		# 	ans.append( velocity[ randint(0,len(velocity)-1) ] )
+		# 	velocity.remove( ans[-1] )
 		return ans
 
 	def sub_position(self,pos_a,pos_b):
@@ -115,13 +120,12 @@ class Particle:
 		print("pbest : ",self.pbest)
 
 def get_randome_position(nodes):
-	# shuffle(nodes)
+	shuffle(nodes)
 	return nodes
 
 def getTime(position):
 	cp=0
 	total_time=0
-	print("-->",position)
 	for i in position:
 		total_time += graph[cp][i]
 		cp=i
@@ -196,40 +200,39 @@ def start_pso(nodes,itr,veh_type,best_solution):
 						ID = 240-best_solution[0]
 				if lock:
 					break
-		# elif veh_type==8:
-		# 	inds = []
-		# 	while twt/4<=ID:
-		# 		lock = True
-		# 		ID1 = 240 - all_st[1][0]
-		# 		ID2 = 240 - all_st[2][0]
-		# 		from_veh = -1
 
-		# 		if ID1>ID2:
-		# 			from_veh=2
-		# 		else:
-		# 			from_veh=1
-		# 		inds = select_nodes(all_st[from_veh][1])
-		# 		for ind in inds:
-		# 			slp = best_solution[1][-2]
-		# 			lp = best_solution[1][-1]
-		# 			if graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] < twt:
-		# 				lock=False
-		# 				all_st[from_veh][1].remove(ind[1])
-		# 				all_st[from_veh]=(getTime(all_st[from_veh][1],0),all_st[from_veh][1])
-		# 				veh3.append(ind[1])
-		# 				all_st[3][1].remove(0)
-		# 				all_st[3][1].append(ind[1])
-		# 				all_st[3][1].append(0)
-		# 				all_st[3]=(getTime(all_st[3][1],0) , all_st[3][1] )
-		# 				shortest_dist=all_st[3]
-		# 				best_solution=all_st[3]
-		# 				if from_veh==1:
-		# 					veh1.remove(ind[1])
-		# 				else:
-		# 					veh2.remove(ind[1])
-		# 				ID = 240-best_solution[0]
-		# 		if lock:
-		# 			break
+		elif veh_type==3:
+			inds = []
+			while twt/4<=ID:
+				lock = True
+				ID1 = 240 - all_st[1][0]
+				ID2 = 240 - all_st[2][0]
+				from_veh = -1
+
+				if ID1>ID2:
+					from_veh=2
+				else:
+					from_veh=1
+				inds = select_nodes(all_st[from_veh][1])
+				for ind in inds:
+					slp = best_solution[1][-2]
+					lp = best_solution[1][-1]
+					if graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] < twt:
+						lock=False
+						all_st[from_veh][1].remove(ind[1])
+						all_st[from_veh]=(getTime(all_st[from_veh][1]),all_st[from_veh][1])
+						veh3.append(ind[1])
+						all_st[3][1].append(ind[1])
+						all_st[3]=(getTime(all_st[3][1]) , all_st[3][1] )
+						gbest=all_st[3]
+						best_solution=all_st[3]
+						if from_veh==1:
+							veh1.remove(ind[1])
+						else:
+							veh2.remove(ind[1])
+						ID = 240-best_solution[0]
+				if lock:
+					break
 
 
 
@@ -247,8 +250,8 @@ def main():
 
 	read_graph()
 	veh1 = [1,4,6,9,10,12]
-	veh3 = [8,13,11,2,5]
-	veh2 = [3,7]
+	veh2 = [8,13,11,2,5]
+	veh3 = [3,7]
 	all_st = {}
 
 	

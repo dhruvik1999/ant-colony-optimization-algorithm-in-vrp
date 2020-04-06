@@ -1,7 +1,4 @@
-import pandas as pd
-import numpy as np 
-import random
-from collections import OrderedDict
+from random import randint 
 
 # def func(pos_a,pos_b):
 # 	ans = []
