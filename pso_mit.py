@@ -4,8 +4,8 @@ import math
 from random import *
 from collections import OrderedDict
 
-num_particles = 3
-iterations = 1000
+num_particles = 5
+iterations = 100
 
 graph = []
 num_node = 0;
@@ -15,8 +15,8 @@ veh2 = []
 veh3 = []
 
 w=0.7
-alpha = 0.9
-beta = 0.7
+alpha = 0.5
+beta = 0.5
 
 twt = 240
 
@@ -24,7 +24,7 @@ def read_graph():
 	global graph
 	global num_node
 
-	df = pd.read_csv('ip2.csv')
+	df = pd.read_csv('ip3.csv')
 	graph  = df.to_numpy()
 	num_node = len(graph)
 
@@ -77,8 +77,7 @@ class Particle:
 
 	def mul_const_list(self,param,velocity):
 		n = len(velocity)
-		param = math.ceil(n*param)
-
+		
 		ans = []
 		for vel in velocity:
 			if param >= random():
@@ -162,6 +161,10 @@ def start_pso(nodes,itr,veh_type,best_solution):
 				gbest=particle.pbest
 
 	for i in range(itr):
+
+		for particle in particles:
+			if particle.pbest[0] < gbest[0]:
+				gbest=particle.pbest
 		
 		for particle in particles:
 			# print("\n particle")
@@ -170,14 +173,11 @@ def start_pso(nodes,itr,veh_type,best_solution):
 			#print("pbest",particle.pbest)
 			# particle.print_state()
 		# print("gbest",gbest)
-
-		for particle in particles:
-			if particle.pbest[0] < gbest[0]:
-				gbest=particle.pbest
-
-
+	if gbest[0]<best_solution[0]:
+		best_solution=gbest
+		
 	ID = twt - gbest[0]
-	if twt/4 <= ID and itr>1:
+	if twt/4 <= ID and itr>randint(10,20):
 		if veh_type==2:
 			from_veh = 1
 			inds = []
@@ -233,10 +233,6 @@ def start_pso(nodes,itr,veh_type,best_solution):
 						ID = 240-best_solution[0]
 				if lock:
 					break
-
-
-
-
 
 	if gbest[0]<best_solution[0]:
 		best_solution=gbest

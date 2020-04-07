@@ -100,7 +100,7 @@ def update_feromone(dpot,best_solution,shortest_dist):
 	for x in best_solution[1]:
 		if cp != x:
 			#Q=1,l=graph[cp][x]
-			ph[cp][x] += 1/graph[cp][x] + (ants/6)*(1/shortest_dist[0])
+			ph[cp][x] += 1/graph[cp][x] 
 			ph[x][cp] = ph[cp][x]
 			cp=x
 
@@ -135,7 +135,7 @@ def opt_2(path):
 	path.insert( randint(0, len(path[:-1])) ,rnd_node)
 
 	#path = [ 2,5,3,4,2,3,0]
-	# return temp_path
+	return temp_path
 	#If the new path has less cost than old one, update the  path by returning new one.
 	if getWeight(temp_path,0) > getWeight(path,0):
 		return path
@@ -192,7 +192,7 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 
 	# print("best",best_solution)
 	ID = 240-best_solution[0]
-	if itr>randint(4,8) and ID>0:
+	if itr>randint(40,60) and ID>0:
 		if veh_type==2:
 			from_veh = 1
 			inds = []
@@ -335,15 +335,16 @@ def main():
 	print("alpha:",alpha, " | beta:", beta, " | density",dens, " | Iterations: ",iterations, " | ants:",ants)
 
 	# code for n number of iteration
+	all_sd[1] = (10**200,[])
+	all_sd[2] = (10**200,[])
+	all_sd[3] = (10**200,[])
 	for itr in range(0,100):
 		read_data()
 
 		iterations=itr
 		#iteration = 1
 		# for n number of iterations, spreading ants in the graph.
-		all_sd[1] = (10**200,[])
-		all_sd[2] = (10**200,[])
-		all_sd[3] = (10**200,[])
+		
 
 
 		for ii in range(iterations):
