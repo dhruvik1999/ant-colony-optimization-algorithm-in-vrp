@@ -155,7 +155,7 @@ def select_nodes(path):
 	ans.sort()
 	return ans
 
-def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
+def start_spreading_ants(nvis,shortest_dist,veh_type,itr,limit):
 	global graph
 	global ph
 	global num_node
@@ -192,7 +192,7 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 
 	# print("best",best_solution)
 	ID = 240-best_solution[0]
-	if itr>randint(40,60) and ID>0:
+	if itr>limit and ID>0:
 		if veh_type==2:
 			from_veh = 1
 			inds = []
@@ -216,6 +216,7 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 						best_solution=all_sd[2]
 						veh1.remove(ind[1])
 						ID = 240-best_solution[0]
+						break
 				if lock:
 					break
 		elif veh_type==3:
@@ -234,7 +235,7 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 				for ind in inds:
 					slp = best_solution[1][-2]
 					lp = best_solution[1][-1]
-					if graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] < twt:
+					if ind[1]!=0 and graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] < twt:
 						lock=False
 						all_sd[from_veh][1].remove(ind[1])
 						all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
@@ -250,6 +251,7 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr):
 						else:
 							veh2.remove(ind[1])
 						ID = 240-best_solution[0]
+						break
 				if lock:
 					break
 
@@ -338,6 +340,8 @@ def main():
 	all_sd[1] = (10**200,[])
 	all_sd[2] = (10**200,[])
 	all_sd[3] = (10**200,[])
+
+	limit = randint(40,70)
 	for itr in range(0,100):
 		read_data()
 
@@ -349,18 +353,18 @@ def main():
 
 		for ii in range(iterations):
 			# this will start spreading ants in the graph.This will return shortest distance of all the previous iterations
-			all_sd[1]= start_spreading_ants(veh1,all_sd[1],1,ii)
+			all_sd[1]= start_spreading_ants(veh1,all_sd[1],1,ii,limit)
 			all_sd[1] = ( getWeight( all_sd[1][1] , 0 ) , all_sd[1][1] )
 
 		for ii in range(iterations):
 			# this will start spreading ants in the graph.This will return shortest distance of all the previous iterations
-			all_sd[2] = start_spreading_ants(veh2,all_sd[2],2,ii)
+			all_sd[2] = start_spreading_ants(veh2,all_sd[2],2,ii,limit)
 			all_sd[2] = ( getWeight( all_sd[2][1] , 0) , all_sd[2][1] )
 
 
 		for ii in range(iterations):
 			# this will start spreading ants in the graph.This will return shortest distance of all the previous iterations
-			all_sd[3] = start_spreading_ants(veh3,all_sd[3],3,ii)
+			all_sd[3] = start_spreading_ants(veh3,all_sd[3],3,ii,limit)
 			all_sd[3] = ( getWeight( all_sd[3][1] , 0) , all_sd[3][1] )
 			
 

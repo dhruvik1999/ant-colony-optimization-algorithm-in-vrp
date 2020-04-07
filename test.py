@@ -23,9 +23,8 @@ from random import randint
 # if __name__ == '__main__':
 # 	main()
 
-a=[1,1,2]
-a=list(OrderedDict.fromkeys(a))
-print(a)
+for i in range(1,100):
+	print(randint(35,65))
 
 
 # number_list = [7, 14, 21, 28, 35, 42, 49, 56, 63, 70]

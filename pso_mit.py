@@ -148,7 +148,7 @@ def select_nodes(path):
 	ans.sort()
 	return ans
 
-def start_pso(nodes,itr,veh_type,best_solution):
+def start_pso(nodes,itr,veh_type,best_solution,limit):
 	global all_st
 	global veh1
 	global veh2
@@ -177,7 +177,7 @@ def start_pso(nodes,itr,veh_type,best_solution):
 		best_solution=gbest
 		
 	ID = twt - gbest[0]
-	if twt/4 <= ID and itr>randint(10,20):
+	if twt/4 <= ID and itr>limit:
 		if veh_type==2:
 			from_veh = 1
 			inds = []
@@ -254,13 +254,13 @@ def main():
 	all_st[1] = (10**200,[])
 	all_st[2] = (10**200,[])
 	all_st[3] = (10**200,[])
-
+	limit = randint(20,40)
 	for i in range(iterations):
-		all_st[1] = start_pso(veh1,i,1,all_st[1])
+		all_st[1] = start_pso(veh1,i,1,all_st[1],limit)
 
-		all_st[2] = start_pso(veh2,i,2,all_st[2])
+		all_st[2] = start_pso(veh2,i,2,all_st[2],limit)
 
-		all_st[3] = start_pso(veh3,i,3,all_st[3])
+		all_st[3] = start_pso(veh3,i,3,all_st[3],limit)
 		print(i , all_st)
 
 
