@@ -1,52 +1,5 @@
-from random import randint 
+ans = {0: 1284, 1: 2371, 2: 1705, 3: 1626, 4: 1997, 5: 955, 6: 1857, 7: 3807, 8: 1357, 9: 2190, 10: 2880, 11: 2809, 12: 2691, 13: 2574, 14: 3255, 15: 1808, 16: 1393, 17: 2678, 18: 3162, 19: 3726, 20: 4190, 21: 3902, 22: 4720}
+count = {0: 6, 1: 12, 2: 9, 3: 10, 4: 11, 5: 5, 6: 9, 7: 20, 8: 7, 9: 11, 10: 15, 11: 14, 12: 14, 13: 13, 14: 16, 15: 8, 16: 7, 17: 13, 18: 17, 19: 18, 20: 21, 21: 20, 22: 24}
 
-# def func(pos_a,pos_b):
-# 	ans = []
-# 	hash = {}
-# 	for i in range( len(pos_b) ):
-# 		hash[ pos_b[i] ]=i
-
-# 	for i in range( len(pos_a) ):
-# 		if pos_a[i]!=pos_b[i]:
-# 			temp_a=pos_b[i]
-# 			temp_b=pos_a[i]
-# 			ans.append( (i,hash[pos_a[i]]) )
-# 			pos_b[i],pos_b[ hash[pos_a[i]] ] = pos_b[ hash[pos_a[i]] ],pos_b[i]
-# 			hash[ temp_a ] , hash[ temp_b ] = hash[ temp_b ] , hash[ temp_a ]
-# 	print(ans)
-# 	return ans
-
-
-# def main():
-# 	func([1,2,3,4,5,6,7,8],[1,8,6,7,2,3,4,5])
-
-# if __name__ == '__main__':
-# 	main()
-
-for i in range(1,100):
-	print(randint(35,65))
-
-
-# number_list = [7, 14, 21, 28, 35, 42, 49, 56, 63, 70]
-# print ("Original list : ",  number_list)
-
-# random.shuffle(number_list) #shuffle method
-# print ("List after first shuffle  : ",  number_list)
-
-# data = pd.read_csv('op2.csv')
-# data = data.to_numpy()
-
-# for i in data:
-# 	if i[1]<=240 and i[2]<=240 and i[3]<=240:
-# 		print(i)
-
-# def opt_2(path):
-# 	temp_path = path.copy()
-# 	rnd_node = np.random.choice(path[:-1])
-# 	path.remove(rnd_node)
-# 	path.insert( np.random.choice( [i for i in range(0,len(path[:-1]))]),rnd_node)
-# 	print(temp_path)
-# 	print(path)
-
-# a = [1,5,4,2,3,6,7,0]
-# opt_2(a)
+for i in range(23):
+	print(ans[i]//count[i])

@@ -3,8 +3,9 @@ import numpy as np
 import math
 from random import *
 from collections import OrderedDict
+import time
 
-num_particles = 5
+num_particles = 20
 iterations = 100
 
 graph = []
@@ -244,24 +245,60 @@ def main():
 	global veh2
 	global veh3
 
-	read_graph()
 	veh1 = [1,4,6,9,10,12]
-	veh2 = [8,11,13,2,5]
+	veh2 = [8,13,11,2,5]
 	veh3 = [3,7]
 	all_st = {}
+	ans = {}
+	count = {}
+	for i in range(23):
+		ans[i]=0
+		count[i]=0
+	total_combinations = 0
+	vehs = [[1,4,6,9,10,12],[55,92,20,33,18],[72,51,79,41,39],[98,16,17,76,56],[21,84,52,99,28],[15,93,27,73,24],[53,59,68,82,25,14],[50,38,75,91,97],[90,85,83,74,29],[70,64,54,46,66,81],[45,48,77,86],[8,11,13,2,5],[26,30,43,96],[31,40,58,62],[34,47,95,63],[36,49,60,65,67],[37,44,61],[69,71,78,80],[42,32,23],[19,100,89],[57,88,94],[87,22,35],[3,7]]
 
-	
-	all_st[1] = (10**200,[])
-	all_st[2] = (10**200,[])
-	all_st[3] = (10**200,[])
-	limit = randint(20,40)
-	for i in range(iterations):
-		all_st[1] = start_pso(veh1,i,1,all_st[1],limit)
 
-		all_st[2] = start_pso(veh2,i,2,all_st[2],limit)
+	for veh in range(100):
+		t1 = time.time()
+		
+		v1 = np.random.choice([0,1,2,3,4,5,6,7,8,9])
+		v2 = np.random.choice([10,11,12,13,14,15,16,17])
+		v3 = np.random.choice([18,19,20,21,22])
 
-		all_st[3] = start_pso(veh3,i,3,all_st[3],limit)
-		print(i , all_st)
+		print(v1,v2,v3)
+		count[v1]+=1
+		count[v2]+=1
+		count[v3]+=1
+
+		veh1 = vehs[v1].copy()
+		veh2 = vehs[v2].copy()
+		veh3 = vehs[v3].copy()
+
+		all_st[1] = (10**200,[])
+		all_st[2] = (10**200,[])
+		all_st[3] = (10**200,[])
+		limit = randint(20,40)
+
+		read_graph()
+		for i in range(40):
+			all_st[1] = start_pso(veh1,i,1,all_st[1],limit)
+
+			all_st[2] = start_pso(veh2,i,2,all_st[2],limit)
+
+			all_st[3] = start_pso(veh3,i,3,all_st[3],limit)
+
+			if all_st[1][0]<240 and all_st[2][0]<240 and all_st[3][0]<240:
+				print(i , all_st,time.time()-t1)
+
+		input()
+		ans[v1]+=all_st[1][0]
+		ans[v2]+=all_st[2][0]
+		ans[v3]+=all_st[3][0]
+
+		print("--->ans",ans)
+		print("--->count",count)
+
+		
 
 
 
