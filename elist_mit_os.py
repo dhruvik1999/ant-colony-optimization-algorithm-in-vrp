@@ -330,10 +330,9 @@ def main():
 	# veh2 = [ int(i) for i in veh2 ]
 	# veh3 = [ int(i) for i in veh3 ]
 
-	veh1 = [1,4,6,9,10,12]
+	veh1 = [1, 4, 6, 9, 10, 12]
 	veh2 = [8,11,13,2,5]
 	veh3 = [3,7]
-
 	print("alpha:",alpha, " | beta:", beta, " | density",dens, " | Iterations: ",iterations, " | ants:",ants)
 
 	# code for n number of iteration

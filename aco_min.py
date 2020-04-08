@@ -4,7 +4,7 @@ from random import randint
 
 #code init
 iterations = 1000
-ants = 13
+ants = 5
 twt = 240
 
 
@@ -12,7 +12,6 @@ twt = 240
 graph = []
 ph = []
 num_node = 0
-nodes = []
 
 #param
 alpha=0.5
@@ -23,9 +22,10 @@ dens=0.25
 veh1 = []
 veh2 = []
 veh3 = []
-all_sd = {}
+all_st = {}
 
 def read_data():
+	#all the variables are global.
 	global graph
 	global ph
 	global num_node
@@ -37,12 +37,11 @@ def read_data():
 	num_node = len(graph)
 	temp = []
 
-	#initiallization of 
+	#initiallization of feromoan level for ants
+	#all edges have same and unit feromoan level
 	for i in range(num_node):
 		ph.append([1 for i in range(num_node)])
 
-	#initiallization of all nodes
-	nodes = [ i for i in range(num_node) ]
 
 def start_ant(nvis,dpot):
 	global graph
@@ -52,7 +51,9 @@ def start_ant(nvis,dpot):
 
 	# init, cp(current position) is dpot.
 	cp=dpot
+	#path will store the route of the ant
 	path = []
+	#starting point of the rout is dpot
 	path.append(cp)
 	# This loop makes ant to visit each&every vertex. By the time visiting the vertex, it will remove the vertex from nvis(not visited list).
 	while len(nvis)!=0:
@@ -73,7 +74,7 @@ def start_ant(nvis,dpot):
 	#returning the path of individual ant.
 	return path
 
-def update_feromone(dpot,best_solution,shortest_dist):
+def update_feromone(dpot,best_solution,shortedt_time):
 	# for all the edge, decresing the level of feromone.
 	for i in range(num_node):
 		for j in range(num_node):
@@ -95,7 +96,6 @@ def update_feromone(dpot,best_solution,shortest_dist):
 	# 2-3
 	# 3-4
 	# 4-0
-
 	# taking each edges in best path and updating feromone level.
 	for x in best_solution[1]:
 		if cp != x:
@@ -104,15 +104,15 @@ def update_feromone(dpot,best_solution,shortest_dist):
 			ph[x][cp] = ph[cp][x]
 			cp=x
 
-def getWeight(path,dpot):
-	# this function counts the summation of the path.
+def gettotal_time(path,dpot):
+	# this function counts the time requires to follow a path..
 	x=dpot
-	weight = 0
+	total_time = 0
 	for y in path:
-		weight+=graph[x][y]
+		total_time+=graph[x][y]
 		x=y
-	weight+=graph[x][dpot]
-	return weight
+	total_time+=graph[x][dpot]
+	return total_time
 
 def get_best_solution(solution):
 	# this function returns path which has min length.
@@ -121,26 +121,6 @@ def get_best_solution(solution):
 		if ma[0]>soln[0]:
 			ma=soln
 	return ma
-
-def opt_2(path):
-	#making 2 path. temp_path is old path. "path" is the path where all the 2-opt changes gonna happen.
-	temp_path = path.copy()
-
-	# path = [2,3,4,5,2,3,0]
-	# selecting rendomly node from the path and removing that node.
-	rnd_node = np.random.choice(path[:-1])
-	path.remove(rnd_node)
-
-	#inserting the selected node randomaly.
-	path.insert( randint(0, len(path[:-1])) ,rnd_node)
-
-	#path = [ 2,5,3,4,2,3,0]
-	return temp_path
-	#If the new path has less cost than old one, update the  path by returning new one.
-	if getWeight(temp_path,0) > getWeight(path,0):
-		return path
-	else:
-		return temp_path
 
 def select_nodes(path):
 	#1--3-4-5-6
@@ -155,7 +135,11 @@ def select_nodes(path):
 	ans.sort()
 	return ans
 
-def start_spreading_ants(nvis,shortest_dist,veh_type,itr,limit):
+def start_spreading_ants(nvis,shortedt_time,veh_type,itr,limit):
+	"""
+		This function will take nvis(non visited nodes) , shortest distance of the previous iterations, typeofvehicle,
+		itr number of iterations, limit after which iteration we have to apply idle time opt.
+	"""
 	global graph
 	global ph
 	global num_node
@@ -164,7 +148,7 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr,limit):
 	global veh1
 	global veh2
 	global veh3
-	global all_sd
+	global all_st
 
 
 	#solution will store all the paths which are coverd by 13 ants.
@@ -178,136 +162,127 @@ def start_spreading_ants(nvis,shortest_dist,veh_type,itr,limit):
 		nnvis.remove(dpot)
 		#ant will start from the mentioned dpot.
 		path = start_ant(nnvis,dpot)
-		path = opt_2(path)
-		solution.append( (getWeight(path,0),path) )
+		solution.append( (gettotal_time(path,0),path) )
 
 	# "get_best_solution" will return shortest path coverd among all the ants.
 	best_solution = get_best_solution(solution)
 
-	# "opt_2" will apply 2-opt method on best solution.
-	opt_best_solution = opt_2(best_solution[1])
-	# upedating the best solution.
-	#todo:
-	best_solution = ( getWeight(opt_best_solution,0) , opt_best_solution )
-
-	# print("best",best_solution)
+	#count the Idle timme for the given vehicle type
 	ID = 240-best_solution[0]
+	# if the idle time is positive and pass the given condition then only we can apply idle time optimization
 	if itr>limit and ID>0:
 		if veh_type==2:
-			from_veh = 1
+			from_veh_type = 1
 			inds = []
 
+			# if the idle time is greater then twt/4, then only vehicle can adopt the node from othervehivle
+			# this is minimum cindition
 			while twt/4 <= ID:
-				inds = select_nodes(all_sd[from_veh][1])
+				# select node will return the list of node of from_veh_type
+				# this list of node is sorted inorder to get the node which decrease the traveling time most
+				inds = select_nodes(all_st[from_veh_type][1])
+				#lock is use to terminate the while loop. if the vehicle is not able to adopt any node from other vehicle
 				lock = True
 				for ind in inds:
-					#slp-lp-0
-					#slp-node-lp-0
+					#slp = second last position
+					#lp = last position
+					# for exaample path : 1-2-3-4-5-6 then slp=5, lp=6
 					slp = best_solution[1][-2]
 					lp = best_solution[1][-1]
-					if graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] < twt:
+
+					#checking that after adding one node, the total time of the path is less then 240 or not
+					if graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] <= twt:
+						#lock is false because we found one node which is adopted by the vehicle
 						lock=False
-						all_sd[from_veh][1].remove(ind[1])
-						all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
+						#removing and updating the node from the solution of from vehicle
+						all_st[from_veh_type][1].remove(ind[1])
+						all_st[from_veh_type]=(gettotal_time(all_st[from_veh_type][1],0),all_st[from_veh_type][1])
+
+						#appending the new node in the vehicle's path, and updating the best solution of this vehicle.
 						veh2.append(ind[1])
-						all_sd[2][1].append(ind[1])
-						all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
-						shortest_dist=all_sd[2]
-						best_solution=all_sd[2]
+						all_st[2][1].append(ind[1])
+						all_st[2]=(gettotal_time(all_st[2][1],0) , all_st[2][1] )
+
+						#after adding new node, updating the best solution.
+						shortedt_time=all_st[2]
+						best_solution=all_st[2]
 						veh1.remove(ind[1])
+
+						# counting IDLE time again, if the idle time is more than twt/4, then again we will adopt one more node.
 						ID = 240-best_solution[0]
 						break
+				# if vehicle not able to adopt any node then we will break the current while loop
 				if lock:
 					break
 		elif veh_type==3:
 			inds = []
+			# checking basic condition for single node adoption.
 			while twt/4<=ID:
+				#lock is use to terminate the while loop. if the vehicle is not able to adopt any node from other vehicle
 				lock = True
-				ID1 = 240 - all_sd[1][0]
-				ID2 = 240 - all_sd[2][0]
-				from_veh = -1
 
+				# vehicle 3 can adopt node for either vehicle1 or vehicle2
+				# counting idle time for both vehicles, 
+				ID1 = 240 - all_st[1][0]
+				ID2 = 240 - all_st[2][0]
+				from_veh_type = -1
+
+				#which ever vehicle has higher value we will adopt node from that vehicle.
 				if ID1>ID2:
-					from_veh=2
+					from_veh_type=2
 				else:
-					from_veh=1
-				inds = select_nodes(all_sd[from_veh][1])
+					from_veh_type=1
+
+				# selectiong node from selected vehicle
+				# select node will return the list of node of from_veh_type
+				# this list of node is sorted inorder to get the node which decrease the traveling time most
+				inds = select_nodes(all_st[from_veh_type][1])
+
+				#iterate through all the nodes and chech the conditions.
 				for ind in inds:
+					#slp = second last position
+					#lp = last position
+					# for exaample path : 1-2-3-4-5-6 then slp=5, lp=6
 					slp = best_solution[1][-2]
 					lp = best_solution[1][-1]
+
+					#checking that after adding one node, the total time of the path is less then 240 or not
 					if ind[1]!=0 and graph[slp][ind[1]]+graph[ind[1]][lp]-graph[slp][lp]+best_solution[0] < twt:
+						#lock is false because we found one node which is adopted by the vehicle
 						lock=False
-						all_sd[from_veh][1].remove(ind[1])
-						all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
+						#removing and updating the node from the solution of from vehicle
+						all_st[from_veh_type][1].remove(ind[1])
+						all_st[from_veh_type]=(gettotal_time(all_st[from_veh_type][1],0),all_st[from_veh_type][1])
+						
+						#appending the new node in the vehicle's path, and updating the best solution of this vehicle.
 						veh3.append(ind[1])
-						all_sd[3][1].remove(0)
-						all_sd[3][1].append(ind[1])
-						all_sd[3][1].append(0)
-						all_sd[3]=(getWeight(all_sd[3][1],0) , all_sd[3][1] )
-						shortest_dist=all_sd[3]
-						best_solution=all_sd[3]
-						if from_veh==1:
+						all_st[3][1].remove(0)
+						all_st[3][1].append(ind[1])
+						all_st[3][1].append(0)
+						all_st[3]=(gettotal_time(all_st[3][1],0) , all_st[3][1] )
+						#after adding new node, updating the best solution.
+						shortedt_time=all_st[3]
+						best_solution=all_st[3]
+						#removing the node from from_veh_type vehicle
+						if from_veh_type==1:
 							veh1.remove(ind[1])
 						else:
 							veh2.remove(ind[1])
+
+						# counting IDLE time again, if the idle time is more than twt/4, then again we will adopt one more node.
 						ID = 240-best_solution[0]
 						break
+				# if vehicle not able to adopt any node then we will break the current while loop
 				if lock:
 					break
 
-
-
-		# 	if twt/4 <= ID and ID <twt/2:
-		# 		# inds.append( np.random.choice( all_sd[from_veh][1][:-1] ) )
-		# 		inds = select_nodes(1,all_sd[from_veh][1])
-		# 		# print("----> ", inds)
-		# 		all_sd[from_veh][1].remove(inds[0])
-		# 		all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
-		# 		veh3.append(inds[0])
-		# 		all_sd[3][1].append(inds[0])
-		# 		all_sd[3]=(getWeight(all_sd[3][1],0) , all_sd[3][1] )
-		# 		shortest_dist=all_sd[3]
-		# 		best_solution=all_sd[3]
-
-		# 		if from_veh==1:
-		# 			veh1.remove(inds[0])
-		# 		else:
-		# 			veh2.remove(inds[0])
-
-		# 	elif twt/2 <= ID and ID < 3*twt/4:
-		# 		inds = select_nodes(2,all_sd[from_veh][1])
-		# 		all_sd[from_veh][1].remove(inds[0])
-		# 		all_sd[from_veh][1].remove(inds[1])
-		# 		all_sd[from_veh]=(getWeight(all_sd[from_veh][1],0),all_sd[from_veh][1])
-		# 		veh3.append(inds[0])
-		# 		veh3.append(inds[1])
-
-		# 		all_sd[3][1].append(inds[0])
-		# 		all_sd[3][1].append(inds[0])
-		# 		all_sd[2]=(getWeight(all_sd[2][1],0) , all_sd[2][1] )
-		# 		shortest_dist=all_sd[2]
-		# 		best_solution=all_sd[2]
-		# 		if from_veh==1:
-		# 			veh1.remove(inds[0])
-		# 			veh1.remove(inds[1])
-		# 		else:
-		# 			veh2.remove(inds[0])
-		# 			veh2.remove(inds[1])
-
-		# 	elif 3*twt/4 >= ID:
-		# 		pass
-		# 	else:
-		# 		pass
-		# else:
-		# 	pass
-
 	#updating the shortest distance.
-	if shortest_dist[0] > best_solution[0]:
-		shortest_dist=best_solution
+	if shortedt_time[0] > best_solution[0]:
+		shortedt_time=best_solution
 
 	#This will update the feromone level.
-	update_feromone(0,best_solution,shortest_dist)
-	return shortest_dist
+	update_feromone(0,best_solution,shortedt_time)
+	return shortedt_time
 
 def main():
 	global alpha
@@ -318,116 +293,47 @@ def main():
 	global veh1
 	global veh2
 	global veh3
-	global all_sd
+	global all_st
 
-	#taking input from user
-	print("------------------------------------------------------------------")
-	# veh1 = input("Vehical 1's nodes :").split(' ')
-	# veh2 = input("Vehical 2's nodes :").split(' ')
-	# veh3 = input("Vehical 3's nodes :").split(' ')
-
-	# veh1 = [ int(i) for i in veh1 ]
-	# veh2 = [ int(i) for i in veh2 ]
-	# veh3 = [ int(i) for i in veh3 ]
-
-	veh1 = [1,4,6,9,10,12]
+	# init the path of all vehicles
+	veh1 = [1, 4, 6, 9, 10, 12]
 	veh2 = [8,11,13,2,5]
 	veh3 = [3,7]
 
+	#printing the value of parameters of the algo
 	print("alpha:",alpha, " | beta:", beta, " | density",dens, " | Iterations: ",iterations, " | ants:",ants)
 
-	# code for n number of iteration
-	all_sd[1] = (10**200,[])
-	all_sd[2] = (10**200,[])
-	all_sd[3] = (10**200,[])
-
+	
+	all_st[1] = (10**200,[])
+	all_st[2] = (10**200,[])
+	all_st[3] = (10**200,[])
 	limit = randint(40,70)
-	# read_data()
 
-	# for ii in range(100):
-	# 		# this will start spreading ants in the graph.This will return shortest distance of all the previous iterations
-	# 	all_sd[1]= start_spreading_ants(veh1,all_sd[1],1,ii,limit)
-	# 	all_sd[1] = ( getWeight( all_sd[1][1] , 0 ) , all_sd[1][1] )
-	# 	print(all_sd[1])
-
-
+	#For n number ofoperations
 	for itr in range(0,100):
 		read_data()
 
+		#setting up the opertions number
 		iterations=itr
-		#iteration = 1
-		# for n number of iterations, spreading ants in the graph.
 		
 		for ii in range(iterations):
 			# this will start spreading ants in the graph.This will return shortest distance of all the previous iterations
-			all_sd[1]= start_spreading_ants(veh1,all_sd[1],1,ii,limit)
-			all_sd[1] = ( getWeight( all_sd[1][1] , 0 ) , all_sd[1][1] )
+			all_st[1]= start_spreading_ants(veh1,all_st[1],1,ii,limit)
+			all_st[1] = ( gettotal_time( all_st[1][1] , 0 ) , all_st[1][1] )
 
 		for ii in range(iterations):
 			# this will start spreading ants in the graph.This will return shortest distance of all the previous iterations
-			all_sd[2] = start_spreading_ants(veh2,all_sd[2],2,ii,limit)
-			all_sd[2] = ( getWeight( all_sd[2][1] , 0) , all_sd[2][1] )
+			all_st[2] = start_spreading_ants(veh2,all_st[2],2,ii,limit)
+			all_st[2] = ( gettotal_time( all_st[2][1] , 0) , all_st[2][1] )
 
 
 		for ii in range(iterations):
 			# this will start spreading ants in the graph.This will return shortest distance of all the previous iterations
-			all_sd[3] = start_spreading_ants(veh3,all_sd[3],3,ii,limit)
-			all_sd[3] = ( getWeight( all_sd[3][1] , 0) , all_sd[3][1] )
+			all_st[3] = start_spreading_ants(veh3,all_st[3],3,ii,limit)
+			all_st[3] = ( gettotal_time( all_st[3][1] , 0) , all_st[3][1] )
 			
 		#printing result, shortest distance of all the vehicals.
-		print(itr,all_sd)
+		print(itr,all_st)
 
 if __name__ == '__main__':
 	main()
-
-
-	
-	# shortest_dist = (10*200,[])
-	# for _ in range(iterations):
-	# 	shortest_dist = start_spreading_ants(veh1,shortest_dist)
-	# sd1=shortest_dist
-	# print("Vehical 1 : ",shortest_dist)
-
-	# shortest_dist = (10*200,[])
-	# for _ in range(iterations):
-	# 	shortest_dist = start_spreading_ants(veh2,shortest_dist)
-	# sd2=shortest_dist
-	# print("Vehical 2 : ",shortest_dist)
-
-	# shortest_dist = (10*200,[])
-	# for _ in range(iterations):
-	# 	shortest_dist = start_spreading_ants(veh3,shortest_dist)
-	# sd3=shortest_dist
-	# print("Vehical 3 : ",shortest_dist)
-	# print(",sd1[0],",",sd2[0],",",sd3[0])
-
-
-
-	# for q in [0.5]:
-	# 	for i in [0.1,0.2,0.3,0.5,0.6,0.8,1]:
-	# 		for j in [0.2,0.3,0.5,0.6,0.8,0.9,1]:
-	# 			alpha=i
-	# 			beta=j
-	# 			dens=q
-	# 			shortest_dist = (10*200,[])
-	# 			for _ in range(iterations):
-	# 				shortest_dist = start_spreading_ants(veh1,shortest_dist)
-	# 			sd1=shortest_dist
-	# 			#print("Vehical 1 : ",shortest_dist)
-
-	# 			shortest_dist = (10*200,[])
-	# 			for _ in range(iterations):
-	# 				shortest_dist = start_spreading_ants(veh2,shortest_dist)
-	# 			sd2=shortest_dist
-	# 			#print("Vehical 2 : ",shortest_dist)
-
-	# 			shortest_dist = (10*200,[])
-	# 			for _ in range(iterations):
-	# 				shortest_dist = start_spreading_ants(veh3,shortest_dist)
-	# 			sd3=shortest_dist
-	# 			#print("Vehical 3 : ",shortest_dist)
-				# print(q,",",i,",",j,",",sd1[0],",",sd2[0],",",sd3[0])
-
-#TODO
-#1. name of variables(ACC to problem)
-#2. MM ideal time.
