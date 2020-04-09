@@ -212,7 +212,7 @@ def start_spreading_ants(nvis,shortest_time,veh_type,itr,limit):
 			# if the idle time is greater then twt/4, then only vehicle can adopt the node from othervehivle
 			# this is minimum cindition
 
-			while twt/4 <= ID and len(veh1)>1:
+			while 25 <= ID and len(veh1)>1:
 				# select node will return the list of node of from_veh_type_type
 				# this list of node is sorted inorder to get the node which decrease the traveling time most
 				inds = select_nodes(all_st[from_veh_type][1])
@@ -256,7 +256,7 @@ def start_spreading_ants(nvis,shortest_time,veh_type,itr,limit):
 		elif veh_type==3:
 			inds = []
 			# checking basic condition for single node adoption.
-			while twt/4<=ID:
+			while 25<=ID:
 				#lock is use to terminate the while loop. if the vehicle is not able to adopt any node from other vehicle
 				lock = True
 				
@@ -365,16 +365,15 @@ def main():
 		plt.clf()
 		output_graph = [ [] , [] , [] , [] ]
 
+		# for n number of iterations, spreading ants in the graph.
+		all_st[1] = (10**200,[])
+		all_st[2] = (10**200,[])
+		all_st[3] = (10**200,[])
+
 		for itr in range(iterations):
 			read_data()
 
 			# iterations=itr
-
-			# for n number of iterations, spreading ants in the graph.
-			all_st[1] = (10**200,[])
-			all_st[2] = (10**200,[])
-			all_st[3] = (10**200,[])
-
 
 			for ii in range(itr):
 				# this will start spreading ants in the graph.This will return shortest time of all the previous iterations

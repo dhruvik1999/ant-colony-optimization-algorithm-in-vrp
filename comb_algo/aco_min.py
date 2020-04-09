@@ -178,7 +178,7 @@ def start_spreading_ants(nvis,shortedt_time,veh_type,itr,limit):
 
 			# if the idle time is greater then twt/4, then only vehicle can adopt the node from othervehivle
 			# this is minimum cindition
-			while twt/4 <= ID:
+			while 25 <= ID:
 				# select node will return the list of node of from_veh_type
 				# this list of node is sorted inorder to get the node which decrease the traveling time most
 				inds = select_nodes(all_st[from_veh_type][1])
@@ -218,7 +218,7 @@ def start_spreading_ants(nvis,shortedt_time,veh_type,itr,limit):
 		elif veh_type==3:
 			inds = []
 			# checking basic condition for single node adoption.
-			while twt/4<=ID:
+			while 25<=ID:
 				#lock is use to terminate the while loop. if the vehicle is not able to adopt any node from other vehicle
 				lock = True
 
@@ -326,9 +326,6 @@ def main():
 		all_st[3] = (10**200,[])
 		for itr in range(iterations):
 			read_data()
-
-
-
 
 			#setting up the opertions number
 			iterations=itr

@@ -213,12 +213,12 @@ def start_pso(nodes,itr,veh_type,best_solution,limit):
 
 	# if the idle time is greater then twt/4, then only vehicle can adopt the node from othervehivle
 	# this is minimum cindition
-	if twt/4 <= ID and itr>limit:
+	if 0 <= ID and itr>limit:
 		if veh_type==2:
 			from_veh = 1
 			inds = []
 
-			while twt/4 <= ID:
+			while 25 <= ID:
 				# select node will return the list of node of from_veh_type
 				# this list of node is sorted inorder to get the node which decrease the traveling time most
 				inds = select_nodes(all_st[from_veh][1])
@@ -257,7 +257,7 @@ def start_pso(nodes,itr,veh_type,best_solution,limit):
 		elif veh_type==3:
 			inds = []
 			# checking basic condition for single node adoption.
-			while twt/4<=ID:
+			while 25<=ID:
 				#lock is use to terminate the while loop. if the vehicle is not able to adopt any node from other vehicle
 				lock = True
 
@@ -328,39 +328,50 @@ def main():
 	veh3 = [3,7]
 	all_st = {}
 
-	#output graph datastructure = x,veh1,veh2,veh3
-	output_graph = [ [] , [] , [] , [] ]
+	vehs_type1 = [[1,4,6,9,10,12],[55,92,20,33,18],[72,51,79,41,39],[98,16,17,76,56],[21,84,52,99,28],[15,93,27,73,24],[53,59,68,82,25,14],[50,38,75,91,97],[90,85,83,74,29],[70,64,54,46,66,81]]
+	vehs_type2 = [[45,48,77,86],[8,11,13,2,5],[26,30,43,96],[31,40,58,62],[34,47,95,63],[36,49,60,65,67],[37,44,61],[69,71,78,80]]
+	vehs_type3 = [[42,32,23],[19,100,89],[57,88,94],[87,22,35],[3,7]]
+	
+
+	for comb in range(0,10):
+
+		veh1 = vehs_type1[ comb%10 ]
+		veh2 = vehs_type2[ comb%8 ]
+		veh3 = vehs_type3[ comb%5 ]
+		limit = randint(4,8)
+		plt.clf()
+		output_graph = [ [] , [] , [] , [] ]
 
 	#inti max shortest time for all vehicles 
-	all_st[1] = (10**200,[])
-	all_st[2] = (10**200,[])
-	all_st[3] = (10**200,[])
-	limit = randint(20,40)
+		all_st[1] = (10**200,[])
+		all_st[2] = (10**200,[])
+		all_st[3] = (10**200,[])
+		limit = randint(20,40)
 
 	#For n number ofoperations
-	for i in range(iterations):
-		#starting pso for first vehicle
-		all_st[1] = start_pso(veh1,i,1,all_st[1],limit)
-		
-		#starting pso for first vehicle
-		all_st[2] = start_pso(veh2,i,2,all_st[2],limit)
-		
-		#starting pso for first vehicle
-		all_st[3] = start_pso(veh3,i,3,all_st[3],limit)
+		for i in range(iterations):
+			#starting pso for first vehicle
+			all_st[1] = start_pso(veh1,i,1,all_st[1],limit)
+			
+			#starting pso for first vehicle
+			all_st[2] = start_pso(veh2,i,2,all_st[2],limit)
+			
+			#starting pso for first vehicle
+			all_st[3] = start_pso(veh3,i,3,all_st[3],limit)
 
-		#printing result
-		print(i , all_st)
-		output_graph[0].append(i)
-		output_graph[1].append(all_st[1][0])
-		output_graph[2].append(all_st[2][0])
-		output_graph[3].append(all_st[3][0])
+			#printing result
+			print(i , all_st)
+			output_graph[0].append(i)
+			output_graph[1].append(all_st[1][0])
+			output_graph[2].append(all_st[2][0])
+			output_graph[3].append(all_st[3][0])
 
-	plt.plot(output_graph[0] , output_graph[1], label="Vehicle 1"  )
-	plt.plot(output_graph[0] , output_graph[2], label="Vehicle 2"  )
-	plt.plot(output_graph[0] , output_graph[3], label="Vehicle 3"  )
-	plt.title("PSO algo")
-	plt.legend()
-	plt.show()
+		plt.plot(output_graph[0] , output_graph[1], label="Vehicle 1"  )
+		plt.plot(output_graph[0] , output_graph[2], label="Vehicle 2"  )
+		plt.plot(output_graph[0] , output_graph[3], label="Vehicle 3"  )
+		plt.title("PSO algo")
+		plt.legend()
+		plt.show()
 
 if __name__ == '__main__':
 	main()
