@@ -4,8 +4,8 @@ from random import randint
 import matplotlib.pyplot as plt
 
 #code init
-iterations = 30
-ants = 13
+iterations = 50
+ants = 15
 twt = 240
 
 
@@ -108,12 +108,12 @@ def update_feromone(dpot,best_solution,shortest_time):
 def total_traveltime(path,dpot):
 	# this function counts the summation of the path.
 	x=dpot
-	weight = 0
+	travel_time = 0
 	for y in path:
-		weight+=graph[x][y]
+		travel_time+=graph[x][y]
 		x=y
-	weight+=graph[x][dpot]
-	return weight
+	travel_time+=graph[x][dpot]
+	return travel_time
 
 def get_best_solution(solution):
 	# this function returns path which has min length.
@@ -212,10 +212,12 @@ def start_spreading_ants(nvis,shortest_time,veh_type,itr,limit):
 			# if the idle time is greater then twt/4, then only vehicle can adopt the node from othervehivle
 			# this is minimum cindition
 
-			while 25 <= ID and len(veh1)>1:
+			while twt/4 <= ID:
 				# select node will return the list of node of from_veh_type_type
 				# this list of node is sorted inorder to get the node which decrease the traveling time most
 				inds = select_nodes(all_st[from_veh_type][1])
+				if( len(inds)<=3 ):
+					break
 				# inds = [ (-100,1) , (-50,2) ]
 				#lock is use to terminate the while loop. if the vehicle is not able to adopt any node from other vehicle
 				lock = True
@@ -256,7 +258,7 @@ def start_spreading_ants(nvis,shortest_time,veh_type,itr,limit):
 		elif veh_type==3:
 			inds = []
 			# checking basic condition for single node adoption.
-			while 25<=ID:
+			while twt/4 <=ID:
 				#lock is use to terminate the while loop. if the vehicle is not able to adopt any node from other vehicle
 				lock = True
 				
@@ -267,9 +269,9 @@ def start_spreading_ants(nvis,shortest_time,veh_type,itr,limit):
 				from_veh_type = -1
 
 				#which ever vehicle has higher value we will adopt node from that vehicle.
-				if ID1>ID2 and len(veh2)>1:
+				if ID1>ID2 and len(veh2)>3:
 					from_veh_type=2
-				elif ID1<ID2 and len(veh2)>1:
+				elif ID1<ID2 and len(veh1)>3:
 					from_veh_type=1
 				else:
 					break
@@ -337,10 +339,10 @@ def main():
 	global veh3
 	global all_st
 
-	# init the path of all vehicles
-	veh1 = [1, 4, 6, 9, 10, 12]
-	veh2 = [8,11,2,13,5]
-	veh3 = [3,7]
+	# # init the path of all vehicles
+	# veh1 = [1, 4, 6, 9, 10, 12]
+	# veh2 = [8,11,2,13,5]
+	# veh3 = [3,7]
 
 	#output graph datastructure = x,veh1,veh2,veh3
 	
@@ -357,7 +359,18 @@ def main():
 	
 
 	for comb in range(0,10):
-
+		"""
+			0, (0,0,0)
+			1, (1,1,1)
+			.
+			.
+			.
+			5, (5,5,0)
+			.
+			.
+			.
+			9, (9,1,4)
+		"""
 		veh1 = vehs_type1[ comb%10 ]
 		veh2 = vehs_type2[ comb%8 ]
 		veh3 = vehs_type3[ comb%5 ]
@@ -405,7 +418,7 @@ def main():
 		plt.plot(output_graph[0] , output_graph[1], label="Vehicle 1"  )
 		plt.plot(output_graph[0] , output_graph[2], label="Vehicle 2"  )
 		plt.plot(output_graph[0] , output_graph[3], label="Vehicle 3"  )
-		ttl = "Combinations : " + str(comb)
+		ttl = "Elist Combinations : " + str(comb+1)
 		plt.title( ttl)
 		plt.legend()
 		plt.show()

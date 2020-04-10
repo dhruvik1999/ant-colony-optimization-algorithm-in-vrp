@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 
 
 #parameters of PSO
-num_particles = 5
-iterations = 100
+num_particles = 10
+iterations = 70
 
 #datastructure
 graph = []
@@ -52,8 +52,9 @@ class Particle:
 		self.pbest=(self.getTime(self.position),self.position.copy())
 
 	def update(self,gbest):
-		#vel = w*vel) + a*(gbest-pos) + b*(pbest-pos)
+		#vel = w*vel + a*(gbest-pos) + b*(pbest-pos)
 		#pos = pos + velocity
+		# *,+(merge),-,+
 		
 		# velocity update using above formula
 		self.velocity = self.merge_list( self.mul_const_list(w,self.velocity.copy()) , self.mul_const_list(alpha, self.sub_position( gbest[1] , self.position.copy() ) ) )
@@ -95,7 +96,7 @@ class Particle:
 
 	def mul_const_list(self,param,velocity):
 		# constant multiplication with the velocity
-		# param * [velocity] = 0.6 * [ (1,5) , (2,3) ] = chance of selection of the item is 0.6
+		# param * [velocity] = 0.7 * [ (1,5) , (2,3) ] = chance of selection of the item is 0.6
 		n = len(velocity)
 		
 		ans = []
@@ -112,6 +113,19 @@ class Particle:
 		hash = {}
 
 		# used hash function for saving the position of the node
+		"""
+			hash
+			1-0
+			2-1
+			3-2
+			4-3
+			5-4
+			
+			[2,3]
+			[2,3]
+			(1,2)
+
+		"""
 		for i in range( len(pos_b) ):
 			hash[ pos_b[i] ]=i
 
@@ -218,7 +232,7 @@ def start_pso(nodes,itr,veh_type,best_solution,limit):
 			from_veh = 1
 			inds = []
 
-			while 25 <= ID:
+			while twt/4 <= ID:
 				# select node will return the list of node of from_veh_type
 				# this list of node is sorted inorder to get the node which decrease the traveling time most
 				inds = select_nodes(all_st[from_veh][1])
@@ -257,7 +271,7 @@ def start_pso(nodes,itr,veh_type,best_solution,limit):
 		elif veh_type==3:
 			inds = []
 			# checking basic condition for single node adoption.
-			while 25<=ID:
+			while twt/4 <=ID:
 				#lock is use to terminate the while loop. if the vehicle is not able to adopt any node from other vehicle
 				lock = True
 
@@ -322,10 +336,10 @@ def main():
 	global veh3
 
 	read_graph()
-	# init the path of all vehicles
-	veh1 = [53, 59,68,82,25,14]
-	veh2 = [8,11,13,2,5]
-	veh3 = [3,7]
+	# # init the path of all vehicles
+	# veh1 = [53, 59,68,82,25,14]
+	# veh2 = [8,11,13,2,5]
+	# veh3 = [3,7]
 	all_st = {}
 
 	vehs_type1 = [[1,4,6,9,10,12],[55,92,20,33,18],[72,51,79,41,39],[98,16,17,76,56],[21,84,52,99,28],[15,93,27,73,24],[53,59,68,82,25,14],[50,38,75,91,97],[90,85,83,74,29],[70,64,54,46,66,81]]
@@ -338,7 +352,7 @@ def main():
 		veh1 = vehs_type1[ comb%10 ]
 		veh2 = vehs_type2[ comb%8 ]
 		veh3 = vehs_type3[ comb%5 ]
-		limit = randint(4,8)
+		limit = randint(20,40)
 		plt.clf()
 		output_graph = [ [] , [] , [] , [] ]
 
@@ -369,7 +383,8 @@ def main():
 		plt.plot(output_graph[0] , output_graph[1], label="Vehicle 1"  )
 		plt.plot(output_graph[0] , output_graph[2], label="Vehicle 2"  )
 		plt.plot(output_graph[0] , output_graph[3], label="Vehicle 3"  )
-		plt.title("PSO algo")
+		title = "PSO comination : " + str(comb+1)
+		plt.title(title)
 		plt.legend()
 		plt.show()
 
